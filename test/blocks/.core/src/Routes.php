@@ -42,7 +42,7 @@ class Routes {
                 // さらに正規化
                 $buffers = self::routeConverting($data);
 
-                foreach($buffers as $subUrl => $subData) {
+                foreach ($buffers as $subUrl => $subData) {
                     $url2 = $url;
                     if ($subUrl != "/") {
                         $url2 .= $subUrl;
@@ -56,6 +56,22 @@ class Routes {
             }
         }
 
+        foreach ($res as $url => $r_) {
+            $r__ = explode("," , $r_);
+            $controller = null;
+            foreach ($r__ as $rr_) {
+                if (strpos($rr_, "controller:") > -1) {
+                    $controller = substr($rr_, strlen("controller:"));
+                }    
+            }
+
+            $res[$url] = [
+                "controller" => $controller,
+            ];
+        }
+
+        echo "<pre>";
+        print_r($res);
         return $res;
     }
 
@@ -130,6 +146,10 @@ class Routes {
         }
 
 		$targetUrls = explode("/", $targetUrl);
+        if (!end($targetUrls)) {
+			array_pop($targetUrls);
+		}
+		array_shift($targetUrls);
 
 		$passParams = [];
 		$matrixA = [];
@@ -154,8 +174,8 @@ class Routes {
                     print($u_ ."=" . $targetUrls[$ind] . "<br>");
 
 				    if(
-                        strpos($u_,"{") > 0 ||
-						strpos($u_,"?}") > 0
+                        strpos($u_,"{?") > 0 ||
+						strpos($u_,"}") > 0
 					){
 						if ($targetUrls[$ind]) {
 							if (empty($passParams[$url])) {
@@ -192,8 +212,8 @@ class Routes {
 	    		}
 				if ($urls[$ind] !== $r_) {
 					if(
-						strpos($urls[$ind],"{") > 0 ||
-						strpos($urls[$ind],"?}") > 0
+						strpos($urls[$ind],"{?") > 0 ||
+						strpos($urls[$ind],"}") > 0
 					){
 
 					}
@@ -216,10 +236,6 @@ class Routes {
 
 		}
 	
-        echo "<pre>";
-        print_r($matrixA);
-        print_r($matrixB);
-        /*
     	$output = null;
 
         $confirmPassParams=null;
@@ -237,6 +253,10 @@ class Routes {
             }
         }
 
+        echo "<pre>";
+        print_r($output);
+        /*
+
     	$output2 = null;
 
     	if(is_array($output)){
@@ -248,7 +268,7 @@ class Routes {
 					$output2 = $o_;
 				}
 				else{
-					if(strtolower($rootParams["method"]) == strtolower($method)){
+					if(strtolower(self::$route -> method) == strtolower($method)){
 						$output2 = $o_;
 						break;
 					}	
@@ -263,7 +283,8 @@ class Routes {
 		
     	$output2["request"] = $confirmPassParams;
 		
-        print($output2);
+        echo 
+        print_r($output2);
         */
     }
 

@@ -10,9 +10,9 @@ class BlockConfig extends BaseBlockConfig {
     public static array $routes = [
         "/" => "controller:main, action:index",
         "/sub" => [
-            "/" => "contrller:sub, action:index",
+            "/" => "controller:sub, action:index",
             "/detail/{id}" => "controller:sub, action:detail",
-            "/show/{?id}" => "contrller:sub, action:show",
+            "/show/{?id}" => "controller:sub, action:show",
         ],
     ];
 }
