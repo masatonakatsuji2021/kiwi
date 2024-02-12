@@ -99,6 +99,9 @@ Block内部の構造詳細は[ここに記載](#block_structur)
 ```
 /blocks                                 <= インストール済Block領域
     /.core                              <= コアライブラリ用Block (kiwiCore)
+        /src
+        /autoload.php                   <= KiwiCore用Autoload
+        /kiwiBlock.json
     /.main                              <= メインアプリ用Block
     /module1                            <= 他アプリBlock
     /module2                            <= 他アプリBlock
@@ -154,6 +157,7 @@ Block内部の構造詳細は[ここに記載](#block_structur)
             ...
         ...
     ...
+/vendor                             <= 任意のcomposerパッケージディレクトリ
 /views                              <= View用ディレクトリ
     /main
         /index.view
@@ -164,6 +168,7 @@ Block内部の構造詳細は[ここに記載](#block_structur)
 /viewparts                          <= ViewPart用ディレクトリ
     /sample.view
     ....
+/BlockEvent.php                     <= Blockアクセスクラス
 /Config.php                         <= Configクラス
 /Export.php                         <= Exportクラス
 /Import.php                         <= Importクラス
@@ -180,14 +185,17 @@ kiwi\core\Lib
     L static versionOnInteger($version) : integer       <= バージョン番号変換 (文字列 -> 整数)
     L static versionOnString($version) : string         <= バージョン番号変換 (数値 -> 文字列)
 kiwi\core\Config
-    L domains : Array<string>                   <= 許可ドメインリスト
-    L routes : Array                            <= Web用経路探索
-    L routeShells : Array                       <= コンソール用経路探索
-    L basicAuthority : Array                    <= ベーシック認証情報
-    L resources : Array                         <= リソース領域情報
-    L consolePasswordHash : string              <= コンソール実行時パスワードハッシュ
-    L makeCmdPasswordHash : string              <= Makeコマンド実行時パスワードハッシュ
-    L before() : void                           <= リクエスト受信時コールバック関数
+    L static domains : Array<string>                   <= 許可ドメインリスト
+    L static basicAuthority : Array                    <= ベーシック認証情報
+    L static consolePasswordHash : string              <= コンソール実行時パスワードハッシュ
+    L static makeCmdPasswordHash : string              <= Makeコマンド実行時パスワードハッシュ
+    L static before() : void                           <= リクエスト受信時コールバック関数
+kiwi\core\AppConfig : Config
+    L static blocks : array                            <= Block経路探索
+kiwi\core\BlockConfig : Config
+    L static routes : Array                            <= Web用経路探索
+    L static routeShells : Array                       <= コンソール用経路探索
+    L static resources : Array                         <= リソース領域情報
 kiwi\core\Controller
     L template : string = null                  <= 使用Template名
     L view : string = null                      <= 使用View名
@@ -240,6 +248,8 @@ kiwi\core\LocalBlock : BlockInfo
     L uninstall() : boolean                                 <= アンインストール実行
 kiwi\core\RemoteBlock : BlockInfo
     L upgrade() : boolean                                               <= インストール/アップグレード実行 (リモートインストール)
+kiwi\core\BlockEvent
+    L static composerAutoload() : void                      <= composerパッケージ使用時のautoload実行用
 kiwi\core\Migrate
     L upgrade() : void                                                  <= アップグレード実行用イベント
     L downgrade() : void                                                <= ダウングレード実行用イベント
