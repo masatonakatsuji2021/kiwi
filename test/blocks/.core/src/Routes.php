@@ -56,22 +56,33 @@ class Routes {
             }
         }
 
-        foreach ($res as $url => $r_) {
-            $r__ = explode("," , $r_);
-            $controller = null;
-            foreach ($r__ as $rr_) {
-                if (strpos($rr_, "controller:") > -1) {
-                    $controller = substr($rr_, strlen("controller:"));
+        return $res;
+    }
+
+    private static function getParam(array $params, string $header, string $default = null) : ?string {
+        $res = $default;
+        foreach ($params as $p_) {
+            if (strpos(trim($p_), $header . ":") > -1) {
+                $res = substr(trim($p_), strlen($header . ":"));
+            }
+        }
+        return $res;
+    }
+
+    // 使用Blockの検索
+    private static function searchBlock(array $blocks) : ?string {
+        $res = null;
+        foreach ($blocks as $url => $blockName) {
+            if ($url == "/") {
+                $res = $blockName;
+            }
+            else{
+                if (strpos(self::$route -> url . "/", $url . "/") === 0) {
+                    $res = $blockName;
                 }    
             }
-
-            $res[$url] = [
-                "controller" => $controller,
-            ];
         }
 
-        echo "<pre>";
-        print_r($res);
         return $res;
     }
 
@@ -79,20 +90,8 @@ class Routes {
 
         self::getRequest();
 
-        $blocks = AppConfig::$blocks;
-
-        // 使用Blockを決定
-        $decisionBlockName = null;
-        foreach ($blocks as $url => $blockName) {
-            if ($url == "/") {
-                $decisionBlockName = $blockName;
-            }
-            else{
-                if (strpos(self::$route -> url . "/", $url . "/") === 0) {
-                    $decisionBlockName = $blockName;
-                }    
-            }
-        }
+        // blockの検索
+        $decisionBlockName = self::searchBlock(AppConfig::$blocks);
 
         // 指定BlockのBLockConfigクラスの存在可否を確認
         $blockConfigPath = "kiwi\\" . $decisionBlockName. "\BlockConfig";
@@ -103,10 +102,17 @@ class Routes {
         // BlockConfigクラスのインスタンスを取得
         $bc = new $blockConfigPath();
 
+        // 経路探索のイベントハンドラ
+        $bc::routeHandle();
+
         // 経路探索リストの正規化
         $bc::$routes = self::routeConverting($bc::$routes);
 
+        // 経路探索リストから結果を抽出
         self::routeSearch($bc::$routes);
+
+        echo "<pre>";
+        print_r(self::$route);
 
         /*
                     $blockEvent = "kiwi\\test1\\BlockEvent";
@@ -236,13 +242,13 @@ class Routes {
 
 		}
 	
-    	$output = null;
+    	$decision = null;
 
         $confirmPassParams=null;
         foreach($matrixA as $url=>$ma_){
             if($ma_ && $ma_==$matrixB[$url]){
 
-                $output = $routes[$url];
+                $decision = $routes[$url];
 
                 if(!empty($passParams[$url])){
                     $confirmPassParams = $passParams[$url];
@@ -253,52 +259,23 @@ class Routes {
             }
         }
 
-        echo "<pre>";
-        print_r($output);
-        /*
+        $decisions = explode(",", $decision);
+        $controller = self::getParam($decisions, "controller");
+        $action = self::getParam($decisions, "action", "index");
+        $method = self::getParam($decisions, "method", "_");
 
-    	$output2 = null;
-
-    	if(is_array($output)){
-
-    //		if($type == self::TYPE_PAGES){
-
-			foreach($output as $method => $o_){
-				if($method == "_"){
-					$output2 = $o_;
-				}
-				else{
-					if(strtolower(self::$route -> method) == strtolower($method)){
-						$output2 = $o_;
-						break;
-					}	
-				}
-			}
-		}
-        /*
-			else if($type == self::TYPE_SHELL){
-				$output2 = $output["_"];
-			}
-        *
-		
-    	$output2["request"] = $confirmPassParams;
-		
-        echo 
-        print_r($output2);
-        */
+        if ($controller) {
+            self::$route -> successed = true;
+            self::$route -> controller = $controller;
+            self::$route -> action = $action;
+            self::$route -> method = $method;    
+        }
+        else {
+            self::$route -> successed = false;
+        }
     }
 
 /*
-    public static function on($url) : RouteResult {
-        $result = new RouteResult;
-        $result->successed = true;
-        $result->block = "main";
-        $result->action = "index";
-        $result->url = "url...";
-        $result->aregments = [];
-        return $result;
-    }
-*/
     public static function add(string $method, string $controller, string $action = null) : string {
         if ($method) {
             $str = "method:" .$method . ", controller:". $controller;
@@ -321,5 +298,5 @@ class Routes {
     public static function post(string $controller, string $action = null) : string{
         return self::add("post", $controller, $action);
     }
-
+*/
 }
