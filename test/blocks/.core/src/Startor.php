@@ -5,6 +5,7 @@ namespace kiwi\core;
 ini_set("display_errors", true);
 
 use Exception;
+use kiwi\core\Kiwi;
 use kiwi\core\Routes;
 
 class Startor {
@@ -31,12 +32,30 @@ class Startor {
             $be->begin();
         }
 
+        $controllerPath = "\kiwi\\" . Routes::$route -> block . "\\controllers\\". Kiwi::upFirst(Routes::$route -> controller) . "Controller";
 
+        if (!class_exists($controllerPath)) {
+            throw new Exception("Controller not found.");
+        }
 
-/*
-        $route = Routes::route();
-        print_r($route);
+        $c = new $controllerPath();
 
-*/
+        $c -> filterBefore();
+
+        if (!method_exists($c, Routes::$route -> action)) {
+            throw new Exception("[Error] アクションメソッドが見つかりませんでした");
+        }
+
+        if (Routes::$route -> aregments) {
+
+        }
+        else {
+            $c -> {Routes::$route -> action}();
+        }
+
+        $c -> filterAfter();
+
+        print(memory_get_peak_usage());
+
     }
 }

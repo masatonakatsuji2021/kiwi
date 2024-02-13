@@ -152,8 +152,6 @@ class Routes {
 				}
 
 				if ($u_ !== $targetUrls[$ind]) {
-                    print($u_ ."=" . $targetUrls[$ind] . "<br>");
-
 				    if(
                         strpos($u_,"{?") > 0 ||
 						strpos($u_,"}") > 0
