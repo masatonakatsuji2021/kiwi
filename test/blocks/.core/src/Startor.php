@@ -28,8 +28,7 @@ class Startor {
         if (class_exists($blockEventPath)) {
             // BlockEventクラスがあればそれをインスタンス化して、beginを実行
             $be = new $blockEventPath();
-            print_r($be);
-//            $be->begin();
+            $be->begin();
         }
 
 
