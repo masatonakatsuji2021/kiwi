@@ -24,6 +24,16 @@ class Startor {
 
         Routes::route();
 
+        $blockEventPath = "\kiwi\\" . Routes::$route -> block . "\\BlockEvent";        
+        if (class_exists($blockEventPath)) {
+            // BlockEventクラスがあればそれをインスタンス化して、beginを実行
+            $be = new $blockEventPath();
+            print_r($be);
+//            $be->begin();
+        }
+
+
+
 /*
         $route = Routes::route();
         print_r($route);

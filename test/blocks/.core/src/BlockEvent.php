@@ -2,12 +2,12 @@
 
 namespace kiwi\core;
 
+use kiwi\core\Routes;
+
 class BlockEvent {
 
-    public $path = "";
-
     public function composerAutoload() : void{
-        require $this->path . "/vendor/autoload.php";
+        require Routes::$route -> blockPath . "/vendor/autoload.php";
     }
 
     public function begin() {

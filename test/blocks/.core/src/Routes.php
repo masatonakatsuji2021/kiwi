@@ -93,6 +93,14 @@ class Routes {
         // blockの検索
         $decisionBlockName = self::searchBlock(AppConfig::$blocks);
 
+        if (!$decisionBlockName) {
+            // Blockがnullの場合はエラー
+            throw new Exception("[Error] Block Not Found.");
+        }
+
+        self::$route -> block = $decisionBlockName;
+        self::$route -> blockPath = KIWI_ROOTDIR . "/blocks/" . $decisionBlockName;
+
         // 指定BlockのBLockConfigクラスの存在可否を確認
         $blockConfigPath = "kiwi\\" . $decisionBlockName. "\BlockConfig";
         if (!class_exists($blockConfigPath)) {
@@ -110,39 +118,6 @@ class Routes {
 
         // 経路探索リストから結果を抽出
         self::routeSearch($bc::$routes);
-
-        echo "<pre>";
-        print_r(self::$route);
-
-        /*
-                    $blockEvent = "kiwi\\test1\\BlockEvent";
-            $be = new $blockEvent();
-            print(KIWI_ROOTDIR . "/blocks/test1");
-            $be->path = KIWI_ROOTDIR . "/blocks/test1";
-            $be->begin();
-        */
-/*
-
-        // 経路探索情報の正規化処理
-        Config::$routes = self::routeConverting(Config::$routes);
-
-        foreach ($routes as $url => $data) {
-            if (is_array($data)) {
-
-            }
-        }
-*/
-/*
-        $result = new RouteResult;
-        $result->successed = true;
-        $result->block = "main";
-        $result->action = "index";
-        $result->url = "url...";
-        $result->aregments = [];
-
-        Routes::$route = $result;
-*/
-//        return $result;
     }
 
     public static function routeSearch(array $routes, string $targetUrl = null) : void {
@@ -269,34 +244,10 @@ class Routes {
             self::$route -> controller = $controller;
             self::$route -> action = $action;
             self::$route -> method = $method;    
+            self::$route -> aregments = $confirmPassParams;
         }
         else {
             self::$route -> successed = false;
         }
     }
-
-/*
-    public static function add(string $method, string $controller, string $action = null) : string {
-        if ($method) {
-            $str = "method:" .$method . ", controller:". $controller;
-        }
-        else {
-            $str = "controller:". $controller. ", action:" . $action;
-        }
-
-        if ($action) {
-            $str .= ", action:" . $action;
-        }
-
-        return $str;
-    }
-
-    public static function get(string $controller, string $action = null) : string{
-        return self::add("get", $controller, $action);
-    }
-
-    public static function post(string $controller, string $action = null) : string{
-        return self::add("post", $controller, $action);
-    }
-*/
 }

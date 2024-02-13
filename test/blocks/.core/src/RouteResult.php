@@ -12,7 +12,8 @@ class RouteResult {
     public string $method;
     public bool $successed;
     public string $block;
+    public string $blockPath;
     public string $action;
-    public array $aregments;
+    public ?array $aregments = null;
     public Exception $exception;
 }
