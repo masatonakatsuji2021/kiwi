@@ -1,0 +1,7 @@
+<?php
+
+// kiwi Core library autoload.
+require dirname(__dir__, 2) ."/blocks/.core/autoload.php";
+
+// Incubator command the Starter class of kiwi Core Library.
+new kiwi\core\Incubator();

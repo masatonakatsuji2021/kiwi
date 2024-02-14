@@ -1,0 +1,5 @@
+<header>Header</header>
+<hr>
+<?php self::view(); ?>
+<hr>
+<footer>Footer area....</footer>

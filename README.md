@@ -100,20 +100,32 @@ Block内部の構造詳細は[ここに記載](#block_structur)
 /blocks                                 <= インストール済Block領域
     /.core                              <= コアライブラリ用Block (kiwiCore)
         /src
-        /autoload.php                   <= KiwiCore用Autoload
+        /autoload.php                   
         /kiwiBlock.json
-    /.main                              <= メインアプリ用Block
+    /main                               <= メインアプリ用Block
     /module1                            <= 他アプリBlock
     /module2                            <= 他アプリBlock
     /module3                            <= 他アプリBlock
     ...
 /backups                               <= バックアップ用Block領域
+    /1.0.0
+        ...
+    /1.0.1
+        ...
     ......
+/repositories                           <= Block別リモートリポジトリ接続情報
+    /.core
+        /RepositoryAccess.php
+    /main
+        /RepositoryAccess.php
+    /module1
+        /RepositoryAccess.php
+        /token
+    ....
 /root                                   <= ルートディレクトリ
     /shell
-        /index.php                      <= コンソール実行用php
-    /incubator
-        /index.php                      <= makeコマンド実行用php
+        /commander                      <= コンソール実行用コマンド
+        /incubator                      <= Block管理、ソース管理用コマンド
     /web
         /index.php                      <= Web公開用php
         /.htaccess
@@ -128,7 +140,8 @@ Block内部の構造詳細は[ここに記載](#block_structur)
     /module1
     /module2
     /module3
-/Config.php                             <= Config設定php
+/Config.php                              <= Configクラス
+/routes.env                              <= Block別経路探索情報用env
 ```
 
 <a id="block_structure"></a>
@@ -168,48 +181,59 @@ Block内部の構造詳細は[ここに記載](#block_structur)
 /viewparts                          <= ViewPart用ディレクトリ
     /sample.view
     ....
-/BlockEvent.php                     <= Blockアクセスクラス
-/Config.php                         <= Configクラス
-/Export.php                         <= Exportクラス
-/Import.php                         <= Importクラス
-/RepositoryAccessDongle.php
+/BlockConfig.php                    <= Configクラス
 /kiwiBlock.json
 ```
 
 ## # Class Object
 
 ```
-kiwi\core\Lib
+kiwi\core\Kiwi
     L static fileSearch($path) : Array                  <= 最深層ディレクトリ探索
     L static allDelete($path) : boolean                 <= ディレクトリ一括削除
     L static versionOnInteger($version) : integer       <= バージョン番号変換 (文字列 -> 整数)
     L static versionOnString($version) : string         <= バージョン番号変換 (数値 -> 文字列)
+    L static loadEnv($filePath) : array                 <= envファイル読込
+    L static saveEnv($filePath, $envData) : boolean     <= envファイル保存
 kiwi\core\Config
     L static domains : Array<string>                   <= 許可ドメインリスト
     L static basicAuthority : Array                    <= ベーシック認証情報
     L static consolePasswordHash : string              <= コンソール実行時パスワードハッシュ
     L static makeCmdPasswordHash : string              <= Makeコマンド実行時パスワードハッシュ
     L static before() : void                           <= リクエスト受信時コールバック関数
-kiwi\core\AppConfig : Config
-    L static blocks : array                            <= Block経路探索
 kiwi\core\BlockConfig : Config
     L static routes : Array                            <= Web用経路探索
     L static routeShells : Array                       <= コンソール用経路探索
     L static resources : Array                         <= リソース領域情報
+    L static handleRoute() : void                      <= 経路探索時ハンドリング
+    L static handleRouteShell() : void                 <= コンソール経路探索時ハンドリング
+    L static handleInstall() : void                    <= インストール時実行用ハンドリング
+    L static handleUninstall() : void                  <= アンインストール時実行用ハンドリング
+    L static handleImportBefore() : void               <= 
+    L static handleImportAfter() : void                <=
+    L static handleExportBefore() : void               <= 
+    L static handleExportAfter() : void                <=
+    L static handleDataDeleteBefore() : void           <= 
+    L static handleDataDeleteAfter() : void            <=
 kiwi\core\Controller
-    L template : string = null                  <= 使用Template名
+    L viewTemplate : string = null              <= 使用Template名
     L view : string = null                      <= 使用View名
-    L blockOnTemplate : string = null           <= 別Block使用時のblock名
+    L blockOnViewTemplate : string = null       <= 別Block使用時のblock名
     L blockOnView : string = null               <= 別Block使用時のblock名
+    L viewPartOnBlock : string = null           <= 別Block使用時のblock名
     L autoRender : boolean                      <= レンダリング有効/無効
-    L filterBefore() : void                     <= action実行前の共通イベント
-    L filterAfter() : void                      <= action実行後の共通イベント
+    L handleBefore() : void                     <= action実行前の共通イベント
+    L handleAfter() : void                      <= action実行後の共通イベント
+    L handleDrawn() : void                      <= レンダリング後の共通イベント
 kiwi\core\ExceptionController : Controller
-    L filterBefore($exception) : void           <= action実行前の共通イベント
-    L filterAfter($exception) : void            <= action実行後の共通イベント
+    L handleBefore($exception) : void           <= action実行前の共通イベント
+    L handleAfter($exception) : void            <= 
+    L handleDrawn($exception) : void            <= 
 kiwi\core\Extension
-    L static use($extensionName) : Array<Extension>             <= 該当Extensionクラスリスト取得
-    L static excute($extensionName, $methodName) : Array<Any>   <= 該当Extensionクラス、指定メソッド実行(レスポンスリスト取得)
+    L static load($extensionName) : Array<Extension>             <= 該当Extensionクラスリスト取得
+    L static excute($extensionName, $methodName) : Array<Any>   <= 該当Extensionクラス、指定メソッド実行(レスポンスリスト取得)]
+    L static loadOnBlock($blockName,$extensionName) : Array<Extension>             <= 指定Block, 該当Extensionクラスリスト取得
+    L static excuteOnBlock($blockName, $extensionName, $methodName) : Array<Any>   <= 指定Block, 該当Extensionクラス、指定メソッド実
 kiwi\core\Block
     L static locals : Array<LocalBlock>                     <= インストール済Blockリスト取得
     L static enableLocals : Array<LocalBlock>               <= インストール済・有効化Blockリスト取得
@@ -593,6 +617,8 @@ class MainController extends Controller {
     - Exportクラスのbeforeメソッドを実行
 
 ## # incubatorコマンド
+
+root/shell ディレクトリから実施可能
 
 ```
 php incubator block lists                                   <= インストール済Blockの一覧表示

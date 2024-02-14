@@ -2,7 +2,7 @@
 
 namespace kiwi\core;
 
-use kiwi\AppConfig;
+use kiwi\Config;
 use Exception;
 
 class Routes {
@@ -91,7 +91,7 @@ class Routes {
         self::getRequest();
 
         // blockの検索
-        $decisionBlockName = self::searchBlock(AppConfig::$blocks);
+        $decisionBlockName = self::searchBlock(Config::$blocks);
 
         if (!$decisionBlockName) {
             // Blockがnullの場合はエラー
@@ -111,7 +111,7 @@ class Routes {
         $bc = new $blockConfigPath();
 
         // 経路探索のイベントハンドラ
-        $bc::routeHandle();
+        $bc::handleRoute();
 
         // 経路探索リストの正規化
         $bc::$routes = self::routeConverting($bc::$routes);

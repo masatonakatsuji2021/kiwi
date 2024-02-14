@@ -16,9 +16,8 @@ spl_autoload_register(function(string $nameSpace) {
             array_shift($spaces2);
             $path = KIWI_ROOTDIR . "/blocks/.core/src/" . $spaces[2]. ".php";
         }
-        else if ($spaces[1] == "main") {
-            array_shift($spaces2);
-            $path = KIWI_ROOTDIR . "/blocks/.main/" . implode("/" , $spaces2) . ".php";
+        else if ($spaces[1] == "repositories") {
+            $path = KIWI_ROOTDIR . "/repositories/" . $spaces[2]. ".php";
         }
         else if (!isset($spaces[2])) {
             $path = KIWI_ROOTDIR . "/" . implode("/" , $spaces2) . ".php";
@@ -29,7 +28,6 @@ spl_autoload_register(function(string $nameSpace) {
 
         if (file_exists($path)) {
             require $path;
-//            throw new Exception("[initial Error] Could not find kiwiCore class file.");
         }
     }
 

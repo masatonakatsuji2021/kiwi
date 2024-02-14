@@ -4,7 +4,7 @@ namespace kiwi;
 
 use kiwi\core\Config as BaseConfig;
 
-class AppConfig extends BaseConfig{
+class Config extends BaseConfig{
 
     public static array $blocks = [
         "/" => "main",

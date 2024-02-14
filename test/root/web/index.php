@@ -6,12 +6,15 @@
  * GitHub   : https://www.github.com/masatonakatsuji2021/kiwi_framework.git
  */
 
-// kiwi Core library autoload.
-require "../../blocks/.core/autoload.php";
-
-// Declare the root directory as a constant.
+ // Declare the root directory as a constant.
 define("KIWI_ROOTUNDERCUT", 2);
 define("KIWI_ROOTDIR", dirname(__DIR__, KIWI_ROOTUNDERCUT));
 
+// kiwi Core library autoload.
+require KIWI_ROOTDIR . "/blocks/.core/autoload.php";
+
+
 // Instantiate the Starter class of kiwi Core Library.
 new kiwi\core\Startor();
+
+

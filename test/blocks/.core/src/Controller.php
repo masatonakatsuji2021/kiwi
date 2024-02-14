@@ -4,17 +4,21 @@ namespace kiwi\core;
 
 class Controller {
     
-    public ?string $viewTemplate = null;
+    public string $viewTemplate;
 
-    public ?string $view = null;
+    public string $view;
 
-    public ?string $viewTemplateOnBlock = null;
+    public string $viewTemplateOnBlock;
 
-    public ?string $viewOnBlock = null;
+    public string $viewOnBlock;
+
+    public string $viewPartOnBlock;
 
     public bool $autoRender = false;
 
-    public function filterBefore () : void {}
+    public function handleBefore() : void {}
 
-    public function filterAfter () : void {}
+    public function handleAfter() : void {}
+
+    public function handleDrawn() : void {}
 }

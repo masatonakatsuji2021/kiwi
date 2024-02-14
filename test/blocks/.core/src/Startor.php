@@ -7,6 +7,7 @@ ini_set("display_errors", true);
 use Exception;
 use kiwi\core\Kiwi;
 use kiwi\core\Routes;
+use kiwi\core\Rendering;
 
 class Startor {
 
@@ -19,8 +20,8 @@ class Startor {
     }
 
     private function start() {
-        if(!class_exists("kiwi\AppConfig")){
-            throw new Exception("[Initial Error] AppConfig class not found.");
+        if(!class_exists("kiwi\Config")){
+            throw new Exception("[Initial Error] Config class not found.");
         } 
 
         Routes::route();
@@ -39,23 +40,36 @@ class Startor {
         }
 
         $c = new $controllerPath();
+        $c -> view = Routes::$route -> controller . "/" . Routes::$route -> action;
 
-        $c -> filterBefore();
+        $c -> handleBefore();
 
         if (!method_exists($c, Routes::$route -> action)) {
-            throw new Exception("[Error] アクションメソッドが見つかりませんでした");
+            throw new Exception("[Error] Action method not found.");
         }
 
         if (Routes::$route -> aregments) {
-
+            $c -> {Routes::$route -> action}(...Routes::$route -> aregments);
         }
         else {
             $c -> {Routes::$route -> action}();
         }
 
-        $c -> filterAfter();
+        $c -> handleAfter();
+
+        // rendering
+        Rendering::$controllerDelegate = $c;
+        if ($c -> autoRender) {
+            if ($c -> viewTemplate) {
+                Rendering::viewTemplate();
+            }
+            else {
+                Rendering::view();
+            }
+        }
+
+        $c -> handleDrawn();
 
         print(memory_get_peak_usage());
-
     }
 }
