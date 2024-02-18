@@ -4,20 +4,21 @@
 
 - kiwi\core\Kiwi    <= Kiwi共通クラス
     - static fileSearch(string $path) : Array                           <= 最深層ディレクトリ探索
-    - static allDelete(string $path) : boolean                          <= ディレクトリ一括削除
+    - static copy(string $targetPath, string $copyPath, bool $deleteCopy = false) : bool          <= ディレクトリ内一括コピー
+    - static delete(string $targetPath) : bool                                <= ディレクトリ内一括削除
     - static versionOnInteger(string $version) : int                    <= バージョン番号変換 (文字列 -> 整数)
     - static versionOnString(int $version) : string                     <= バージョン番号変換 (数値 -> 文字列)
     - static loadEnv(string $filePath) : array                          <= envファイル読込
     - static saveEnv(string $filePath, array $envData) : boolean        <= envファイル保存
-    - static ucFirst(string $text) : string                             <= 先頭を大文字変換
-    - static lcFirst(string $text) : string                             <= 先頭を小文字変換
+    - static upFirst(string $text) : string                             <= 先頭を大文字変換
+    - static downFirst(string $text) : string                           <= 先頭を小文字変換
     - static composerAutoload() : void                                  <= composerパッケージ使用時のautoload実行用
 - kiwi\core\Config  <= 共通設定用
     - static domains : Array<string>                   <= 許可ドメインリスト
     - static basicAuthority : Array                    <= ベーシック認証情報
     - static useCommander : bool                       <= commanderコマンド有効/無効
     - static useIncubator : bool                       <= incubatorコマンド有効/無効
-    - static handleRequest(string $url) : void         <= リクエスト受信時ハンドリング
+    - static handleRequest() : void                    <= リクエスト受信時ハンドリング
 - kiwi\core\ContainerConfig : Config    <= Container設定用
     - static routes : Array                            <= Web用経路探索
     - static routeShells : Array                       <= コンソール用経路探索
@@ -52,6 +53,7 @@
     - static loadOnContainer(string $ContainerName, string $extName) : Array<Extension>                 <= 指定Container, 該当Extensionクラスリスト取得
     - static excuteOnContainer(string $ContainerName, string $extName, string $methodName) : Array<Any> <= 指定Container, 該当Extensionクラス、指定メソッド実行
 - kiwi\core\Container   <= Container操作クラス
+    - static getConfig(string $containerName) : ContainerConfig                         <= ContainerConfigクラス取得
     - static locals(array $options = null) : Array<LocalContainer>                      <= インストール済Containerリスト取得
     - static local(string $ContainerName) : LocalContainer                              <= 指定Container名のインストール済Container取得
     - static remote(ContainerRepository $containerRepository) : RemoteContainer         <= 指定リポジトリ情報での最新版RemoteContainer取得
@@ -150,7 +152,8 @@
     - static getViewTemplate(string $templatePath = null) : string          <= ViewTemplateファイルのレスポンス取得
     - static viewPart(string $viewPartPath) : void                          <= ViewPartファイルのロード
     - static getViewPart(string $viewPartPath) : string                     <= ViwePartファイルのレスポンス取得
-    - static setData(string $name, any $value) : void                       <= レンダリングへデータをセット
+    - static set(string $name, any $value) : void                       <= レンダリングへデータをセット
+    - static get(string $name)                                          <= セットされたデータを取得
 - kiwi\core\Request
     - static method() : string                  <= リクエストメソッド取得
     - static get() : Array<Any>                 <= GETパラメータ取得
