@@ -43,9 +43,8 @@
     - handleBefore() : void                     <= action実行前ハンドリング
     - handleAfter() : void                      <= action実行後ハンドリング
     - handleDrawn() : void                      <= レンダリング後ハンドリング
-- kiwi\core\ExceptionController : Controller    <= エラー判定用Controller
-    - handleBefore($exception) : void           <= action実行前ハンドリング
-    - handleAfter($exception) : void            <= action実行後ハンドリング
+- kiwi\core\ExceptionController                 <= エラー判定用Controller
+    - handle($exception) : void                 <= エラーハンドリング
     - handleDrawn($exception) : void            <= レンダリング後ハンドリング
 - kiwi\core\Extension   <= 拡張実行用
     - static load(string $extName) : Array<Extension>                                           <= 該当Extensionクラスリスト取得

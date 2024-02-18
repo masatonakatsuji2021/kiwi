@@ -19,7 +19,12 @@ class Startor {
         try {
             $this->start($consoleMode);
         } catch (Exception $e) {
-            echo $e->getMessage();
+            if ($consoleMode) {
+                echo $e->getMessage();
+            } 
+            else {
+                self::showExceptionController($e);
+            }
         }
     }
 
@@ -77,9 +82,11 @@ class Startor {
                     exit;    
                 }
             }
-    
         }
 
+        if (!Routes::$route -> successed) {
+            self::error("Route Controller or Action not found.");
+        }
 
         $controllerPath = "\kiwi\\" . Routes::$route -> container . "\\app\\controllers\\". Kiwi::upFirst(Routes::$route -> controller) . "Controller";
 
@@ -123,6 +130,40 @@ class Startor {
         $c -> handleDrawn();
 
         print(memory_get_peak_usage());
+    }
+
+    private static function showExceptionController (Exception $exception) {
+        try {
+            $controllerPath = "\kiwi\\" . Routes::$route -> container . "\\app\\controllers\\ExceptionController";
+ 
+            if (!class_exists($controllerPath)) {
+                $controllerPath = "kiwi\core\ExceptionController";
+            }
+
+            // Controllerのインスタンスとセット
+            $c = new $controllerPath();
+            $c -> view = "exception/index";
+
+            $c->handle($exception);
+
+            // rendering
+            Rendering::$controllerDelegate = $c;
+            if ($c -> autoRender) {
+                if ($c -> viewTemplate) {
+                    Rendering::viewTemplate();
+                }
+                else {
+                    Rendering::view();
+                }
+            }
+
+            $c -> handleDrawn();
+
+
+        } catch (Exception $e) {
+
+        }
+
     }
 
     private static function showShell (){

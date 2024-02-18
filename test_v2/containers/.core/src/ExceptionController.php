@@ -6,9 +6,9 @@ use Exception;
 
 class ExceptionController extends Controller {
 
-    public function handleBefore(Exception $exp = null) : void {}
+    public function handle(Exception $exp) : void {
+        echo $exp;
+    }
 
-    public function handleAfter(Exception $exp = null) : void {}
-
-    public function handleDrawn(Exception $exp = null) : void {} 
+    public function handleDrawn() : void {} 
 }
