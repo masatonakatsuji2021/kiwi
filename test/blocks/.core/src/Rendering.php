@@ -84,4 +84,8 @@ class Rendering {
         require $viewPartPath;
     }
 
+    public static function setData(string $name, $value) : void {
+        $$name = $value;
+    }
+
 }

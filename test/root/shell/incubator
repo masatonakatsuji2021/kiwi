@@ -1,7 +1,17 @@
 <?php
+/**
+ * kiwiFramework (version 1.0.0)
+ * author   : Masato Nakatsuji
+ * created  : 2024.02.12
+ * GitHub   : https://www.github.com/masatonakatsuji2021/kiwi_framework.git
+ */
+
+ // Declare the root directory as a constant.
+define("KIWI_ROOTUNDERCUT", 2);
+define("KIWI_ROOTDIR", dirname(__DIR__, KIWI_ROOTUNDERCUT));
 
 // kiwi Core library autoload.
-require dirname(__dir__, 2) ."/blocks/.core/autoload.php";
+require KIWI_ROOTDIR ."/blocks/.core/autoload.php";
 
 // Incubator command the Starter class of kiwi Core Library.
 new kiwi\core\Incubator();

@@ -11,20 +11,21 @@ use kiwi\core\Rendering;
 
 class Startor {
 
-    public function __construct() {
+    public function __construct(bool $consoleMode = false) {
         try {
-            $this->start();
+            $this->start($consoleMode);
         } catch (Exception $e) {
             echo $e->getMessage();
         }
     }
 
-    private function start() {
+    private function start($consoleMode = false) : void {
         if(!class_exists("kiwi\Config")){
             throw new Exception("[Initial Error] Config class not found.");
         } 
 
-        Routes::route();
+        // 経路探索を開始
+        Routes::route($consoleMode);
 
         $blockEventPath = "\kiwi\\" . Routes::$route -> block . "\\BlockEvent";        
         if (class_exists($blockEventPath)) {
@@ -33,12 +34,23 @@ class Startor {
             $be->begin();
         }
 
+        if ($consoleMode) {
+            self::showShell();
+        }
+        else {
+            self::showController();            
+        }
+    }
+    
+    private static function showController() {
+        
         $controllerPath = "\kiwi\\" . Routes::$route -> block . "\\controllers\\". Kiwi::upFirst(Routes::$route -> controller) . "Controller";
 
         if (!class_exists($controllerPath)) {
             throw new Exception("Controller not found.");
         }
 
+        // Controllerのインスタンスとセット
         $c = new $controllerPath();
         $c -> view = Routes::$route -> controller . "/" . Routes::$route -> action;
 
@@ -71,5 +83,9 @@ class Startor {
         $c -> handleDrawn();
 
         print(memory_get_peak_usage());
+    }
+
+    private static function showShell (){
+
     }
 }

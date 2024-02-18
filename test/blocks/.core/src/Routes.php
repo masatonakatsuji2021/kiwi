@@ -9,6 +9,11 @@ class Routes {
 
     public static RouteResultWeb $route;
 
+    private static function getConsole() : void {
+        print_r("console .....");
+        exit;
+    }
+
     private static function getRequest() : void {
         $res = new RouteResultWeb;
 
@@ -86,9 +91,14 @@ class Routes {
         return $res;
     }
 
-    public static function route() : void {
+    public static function route(bool $consoleMode) : void {
 
-        self::getRequest();
+        if ($consoleMode) {
+            self::getConsole();
+        }
+        else {
+            self::getRequest();
+        }
 
         // blockの検索
         $decisionBlockName = self::searchBlock(Config::$blocks);
