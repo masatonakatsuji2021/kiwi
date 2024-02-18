@@ -1,0 +1,7 @@
+<header>
+<?php echo self::get("title"); ?>
+</header>
+<hr>
+<?php self::view(); ?>
+<hr>
+<footer>Footer area....</footer>
