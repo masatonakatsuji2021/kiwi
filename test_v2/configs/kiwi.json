@@ -1,0 +1,12 @@
+{
+    "routes": {
+        "/": { "container": "main" },
+        "/sub1": { "container": "sub1" },
+        "/admin/sub1": {"container": "sub1", "route": "/admin"}
+    },
+    "versions": {
+        "core": "1.0.0",
+        "main": "1.0.0",
+        "sub1": "1,0,0"
+    }
+}

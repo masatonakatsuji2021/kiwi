@@ -17,5 +17,3 @@ require KIWI_ROOTDIR . "/containers/.core/autoload.php";
 
 // Instantiate the Starter class of kiwi Core Library.
 new kiwi\core\Startor();
-
-
