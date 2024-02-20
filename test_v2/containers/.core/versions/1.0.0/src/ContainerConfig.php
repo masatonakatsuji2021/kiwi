@@ -45,6 +45,9 @@ class ContainerConfig extends Config{
      */
     public static array $resources;
 
+    
+    public static array $writables;
+
     /**
      * 経路探索時ハンドリング
      */

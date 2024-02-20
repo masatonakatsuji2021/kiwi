@@ -41,10 +41,6 @@ function kiwiJsonLoad() {
     return json_decode($content, true);
 }
 
-function getNamespaceVersion(string $version) {
-
-}
-
 spl_autoload_register(function(string $nameSpace) {
     
     $json = kiwiJsonLoad();

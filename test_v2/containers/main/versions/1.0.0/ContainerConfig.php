@@ -16,6 +16,13 @@ class ContainerConfig extends CC {
         ],
     ];
 
+    public static array $resources = [
+        "/common" => [
+            "release" => true,
+            "cache-max-age" => 3600,
+        ],
+    ];
+
     /*
     public static function handleRequest(): void
     {

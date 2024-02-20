@@ -35,6 +35,7 @@ class RouteResult {
     public string $method;
     public bool $successed;
     public string $container;
+    public string $containerVersion;
     public string $containerPath;
     public string $action;
     public ?array $aregments = null;

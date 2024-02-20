@@ -48,13 +48,14 @@ class Startor {
     private function start($consoleMode = false) : void {
 
         // 経路探索を開始
-        Routes::route($consoleMode);
-
         if ($consoleMode) {
             self::showShell();
         }
         else {
-            self::showController();            
+            $res = Routes::routeWeb();
+            if ($res) {
+                self::showController();
+            }
         }
     }
     

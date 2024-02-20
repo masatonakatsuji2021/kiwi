@@ -96,22 +96,68 @@ class Routes {
         return $res;
     }
 
-    public static function route(bool $consoleMode) : void {
-
-        if ($consoleMode) {
-            self::getConsole();
+    private static function routeResource(ContainerConfig $cc) : bool {
+        if (!isset($cc::$resources)) {
+            return false;
         }
-        else {
-            self::getRequest();
+        return self::routeResourceWritable("resources", $cc::$resources);
+    }
+
+    private static function routeWritable(ContainerConfig $cc) : bool {
+        if (!isset($cc::$writables)) {
+            return false;
+        }
+        return self::routeResourceWritable("writables", $cc::$writables);
+    }
+
+    private static function routeResourceWritable(string $type, array $routes) : bool {
+
+        $decision = null;
+        foreach ($routes as $url => $r_) {
+            $targetUrl = "/" . self::$route -> container . $url;
+            if (strpos(self::$route -> url, $targetUrl) === 0) {
+                $decision = $r_;
+            }
         }
 
-        $routeData = kiwiJsonLoad()["routes"];
+        if (!$decision) {
+            return false;
+        }
+
+        if (!$decision["release"]) {
+            return false;
+        }
+
+        $path = str_replace("//", "/", KIWI_ROOT_CONTAINER . "/" . self::$route -> container . "/versions/" . self::$route -> containerVersion . "/" . $type . "/" . substr(self::$route -> url, strlen("/". self::$route -> container)));
+
+        if (!file_exists($path)) {
+            return false;
+        }
+
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->file($path);
+
+        header("Content-Type: " . $mimeType);
+        if (isset($decision["cache-max-age"])) {
+            header("Cache-Control: max-age=" . $decision["cache-max-age"]);
+        }
+
+        echo file_get_contents($path);
+
+        return true;
+    }
+
+    public static function routeWeb() : bool {
+
+        self::getRequest();
+
+        $kiwiJson = kiwiJsonLoad();
 
         // containerの検索
         $decisionContainer = null;
         $changeUrl = null;
         $addUrl = null;
-        foreach ((array)$routeData as $url => $r_) {
+        foreach ((array)$kiwiJson["routes"] as $url => $r_) {
             if (strpos(self::$route -> url, $url) === 0) {
                 $decisionContainer = $r_["container"];
                 $changeUrl = $url;
@@ -128,6 +174,7 @@ class Routes {
 
         self::$route -> container = $decisionContainer;
         self::$route -> containerPath = KIWI_ROOT_CONTAINER . "/". $decisionContainer;
+        self::$route -> containerVersion = $kiwiJson["versions"][$decisionContainer];
         self::$route -> url = substr(self::$route -> url, strlen($changeUrl));
         if (!$addUrl) {
             $addUrl = "/";
@@ -142,6 +189,18 @@ class Routes {
             throw new Exception("[initial Error] ContainerConfig class for specified Container not found.");
         }
 
+        // resource data
+        $juge = self::routeResource($cc);
+        if ($juge){
+            return false;
+        }
+
+        // writable data
+        $juge = Routes::routeWritable($cc);
+        if ($juge) {
+            return false;
+        }
+
         // 経路探索のイベントハンドラ
         $buff = $cc::handleRoute($cc::$routes);
         if ($buff) {
@@ -153,6 +212,8 @@ class Routes {
 
         // 経路探索リストから結果を抽出
         self::routeSearch($cc::$routes);
+
+        return true;
     }
 
     public static function routeSearch(array $routes, string $targetUrl = null) : void {
