@@ -1,0 +1,9 @@
+{
+    "name": "core",
+    "version": "1.0.0",
+    "title": "kiwi core library",
+    "description": "Kiwi framework core library packages.",
+    "author": "Masato Nakatsuji",
+    "homeUrl": "",
+    "email": ""
+}

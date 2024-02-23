@@ -28,6 +28,11 @@ namespace kiwi\core\consoles;
 use Exception;
 use kiwifw\configs\ProjectConfig;
 use kiwi\core\containers\ContainerCreateOption;
+use kiwi\core\containers\ContainerDevelopment;
+
+
+use kiwi\core\developments\PhpCodeMake;
+
 
 class Incubator {
 
@@ -156,7 +161,7 @@ class Incubator {
             $value = false;
         }
 
-        print_r($value);
+        $juge = ContainerDevelopment::create($cco);
 
     }
 }

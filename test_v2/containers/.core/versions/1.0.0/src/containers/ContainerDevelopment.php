@@ -25,12 +25,62 @@
 
 namespace kiwi\core\containers;
 
+use kiwi\core\developments\PhpCodeMake;
+
 class ContainerDevelopment {
 
     /**
      * Containerの新規作成
      */
-    public static function create(ContainerCreateOption $containerCreateOption) : bool {
+    public static function create(ContainerCreateOption $cco) : bool {
+       
+        echo "\nCreate Start..\n";
+
+        echo "mkdir /" . $cco->name . "\n";
+        mkdir(KIWI_ROOT_CONTAINER . "/" . $cco->name);
+
+        echo "mkdir /" . $cco->name . "/versions" . "\n";
+        mkdir(KIWI_ROOT_CONTAINER . "/" . $cco->name . "/versions");
+
+        echo "mkdir /" . $cco->name . "/writables" . "\n";
+        mkdir(KIWI_ROOT_CONTAINER . "/" . $cco->name . "/writables");
+
+        echo "mkdir /" . $cco->name . "/temps" . "\n";
+        mkdir(KIWI_ROOT_CONTAINER . "/" . $cco->name . "/temps");
+
+        echo "mkdir /" . $cco->name . "/versions/". $cco->version . "\n";
+        mkdir(KIWI_ROOT_CONTAINER . "/" . $cco->name . "/versions/". $cco->version);
+
+        // make kiwiContainer.json
+        echo "make  /" . $cco->name . "/versions/". $cco->version . "/versions/" . $cco->version . "/kiwiContainer.json" . "\n";
+        file_put_contents(KIWI_ROOT_CONTAINER . "/". $cco->name . "/versions/" . $cco->version . "/kiwiContainer.json", json_encode((array)$cco, JSON_PRETTY_PRINT));
+
+        // make kiwiRelease.json
+        $release = [
+            [
+                "version" => $cco->version,
+                "modifiedDate" => date("Y-m-d H:i:s"),
+                "name" => $cco->name,
+                "title" => $cco->title,
+                "comment" => "new release.",
+            ],
+        ];
+        echo "make  /" . $cco->name . "/versions/". $cco->version . "/versions/" . $cco->version . "/kiwiRelease.json" . "\n";
+        file_put_contents(KIWI_ROOT_CONTAINER . "/". $cco->name . "/versions/" . $cco->version . "/kiwiRelease.json", json_encode($release, JSON_PRETTY_PRINT));
+
+        // update Kiwi 
+        $kiwi = kiwiLoad();
+
+        $kiwi["routes"]["/" . $cco->name] = [
+            "container" => $cco->name,
+        ];
+        $kiwi["versions"][$cco->name] = $cco->version;
+
+        echo "update /configs/Kiwi\n";
+        file_put_contents(KIWI_ROOTDIR . "/configs/Kiwi.test", PhpCodeMake::createReturnArray($kiwi));
+
+
+        echo "\nCreate Complete!" . "\n";
         return true;
     }
 
