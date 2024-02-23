@@ -89,16 +89,16 @@ spl_autoload_register(function(string $nameSpace) {
         }
 
         if (file_exists($path)) {
-            require_once $path;
+            require $path;
         }
     }
-    if ($spaces[0] == "kiwifw") {
+    else if ($spaces[0] == "kiwifw") {
         $spaces2 = $spaces;
         array_shift($spaces2);
 
         $path = KIWI_ROOTDIR . "/" . implode("/" , $spaces2) . ".php";
         if (file_exists($path)) {
-            require_once $path;
+            require $path;
         }
     }
 

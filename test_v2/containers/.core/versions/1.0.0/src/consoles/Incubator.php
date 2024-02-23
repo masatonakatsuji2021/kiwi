@@ -26,7 +26,8 @@
 namespace kiwi\core\consoles;
 
 use Exception;
-use kiwi\configs\ProjectConfig;
+use kiwifw\configs\ProjectConfig;
+use kiwi\core\containers\ContainerCreateOption;
 
 class Incubator {
 
@@ -68,15 +69,94 @@ class Incubator {
         }
     }
 
-
     private function create() {
-        echo "[Kiwi Incubator Create]\n\n";
+        echo "[Kiwi Incubator Container Create]\n\n";
 
-        echo "- Container name :";
+        $cco = new ContainerCreateOption();
 
-        $containerName = fgets(STDIN);
+        $value = null;
+        while (!$value) {
+            echo "Q. Container name? :";
+            $value = trim(fgets(STDIN));
+            if ($value == "") {
+                echo "[ERROR] Container name has not been entered. \n";
+                $value = null;
+            }    
+        }
 
-        echo $containerName;
+        $cco -> name = $value;
+
+        // version number
+        $value = null;
+        while (!$value) {
+            echo "Q. Initial version number? (1.0.0) :";
+            $value = trim(fgets(STDIN));
+            if ($value == "") {
+                $value = "1.0.0";
+            }
+        }
+
+        $cco -> version = $value;
+
+        // title
+        $value = null;
+        while (!$value) {
+            echo "Q. Display container title? (" . $cco->name . ") :";
+            $value = trim(fgets(STDIN));
+            if ($value == "") {
+                $value = $cco->name;
+            }
+        }
+
+        $cco -> title = $value;
+
+        // description
+        $value = null;
+        echo "Q. Container description? () :";
+        $value = trim(fgets(STDIN));
+
+        $cco -> description = $value;
+        
+        // author
+        $value = null;
+        echo "Q. Author? () :";
+        $value = trim(fgets(STDIN));
+        $cco -> author = $value;
+
+        // home url
+        $value = null;
+        echo "Q. Home url? () :";
+        $value = trim(fgets(STDIN));
+        
+        $cco -> homeUrl = $value;
+        
+        // home url
+        $value = null;
+        echo "Q. Email address? () :";
+        $value = trim(fgets(STDIN));
+
+        $cco -> email = $value;
+
+        echo "\nCreate a Container with the following content.\n\n";
+
+        echo "  Container name          : " . $cco->name. "\n";
+        echo "  Initial version number  : " . $cco->version ."\n";
+        echo "  Display container title : " . $cco->title . "\n";
+        echo "  Container description   : " . $cco->description . "\n";
+        echo "  Author                  : " . $cco->author . "\n";
+        echo "  Home url                : " . $cco->homeUrl . "\n";
+        echo "  Email address           : " . $cco->email . "\n";
+        echo "\n\nIt is ok? (y) :";
+        $value = trim(fgets(STDIN));
+
+        if ($value == "" || $value == "y" || $value == "Y"){
+            $value = true;
+        }
+        else {
+            $value = false;
+        }
+
+        print_r($value);
 
     }
 }

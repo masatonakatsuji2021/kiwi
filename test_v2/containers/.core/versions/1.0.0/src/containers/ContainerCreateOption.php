@@ -30,4 +30,25 @@ class ContainerCreateOption {
      * Container Name
      */
     public string $name;
+
+    /**
+     * Initial version number
+     */
+    public string $version;
+
+    /**
+     * Display container title
+     */
+    public string $title;
+
+    /**
+     * Container description
+     */
+    public string $description;
+
+    public string $author;
+
+    public string $homeUrl;
+
+    public string $email;
 }
