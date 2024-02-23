@@ -25,33 +25,43 @@
 
 namespace kiwi\core\renders;
 
+use kiwi\core\routes\Routes;
+use kiwi\core\controllers\Controller;
+
 class Render {
+
+    public static ?Controller $controllerDelegate = null;
+    private static $_dataBuffer = [];
 
     /**
      * レンダリングへデータをセット
      */
     public static function set(string $name, $value) : void {
-
+        self::$_dataBuffer[$name] = $value;
     }
 
     /**
      * レンダリングへデータを一括セット
      */
     public static function bind(array $values) : void {
-
+        foreach ($values as $key => $value) {
+            self::$_dataBuffer[$key] = $value;
+        }
     }
 
     /**
      * セットされたデータを取得
      */
     public static function get (string $name) {
-        return null;
+        if (isset(self::$_dataBuffer[$name])) {
+            return self::$_dataBuffer[$name];
+        }
     }
 
     /**
      * 指定URLをルートベースURLに変更
      */
     public static function url (string $url) : string {
-        return $url;
+        return Routes::$route -> full . $url;
     }
 }

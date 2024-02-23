@@ -227,7 +227,7 @@ class Kiwi {
      * @return void
      */
     public static function composerAutoload() : void {
-        $jsonData = kiwiJsonLoad();
+        $jsonData = kiwiLoad();
         $version = $jsonData["versions"][Routes::$route -> container];
         require KIWI_ROOT_CONTAINER . "/" . Routes::$route -> container ."/versions/". $version. "/vendor/autoload.php";
     }   

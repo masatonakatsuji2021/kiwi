@@ -28,128 +28,118 @@ namespace kiwi\core;
 use Exception;
 use kiwi\core\routes\Routes;
 use kiwi\core\containers\Container;
+use kiwi\core\renders\Render;
+use kiwi\core\renders\View;
+use kiwi\core\renders\ViewTemplate;
+
 
 /**
  * WebStartor Class
  */
 class WebStartor {
 
-    public function __construct(bool $consoleMode = false) {
+    /**
+     * constructor
+     */
+    public function __construct() {
         try {
-            $this->start($consoleMode);
-        } catch (Exception $e) {
-            if ($consoleMode) {
-                echo $e->getMessage();
-            } 
-            else {
-                self::showExceptionController($e);
-            }
-        }
-    }
-
-    private function start($consoleMode = false) : void {
-
-        // 経路探索を開始
-        if ($consoleMode) {
-            self::showShell();
-        }
-        else {
+            // 経路探索を開始
             $res = Routes::routeWeb();
-            if ($res) {
-                self::showController();
+            if (!$res) {
+                return;
             }
-        }
-    }
-    
-    private static function showController() {
         
-        $kiwiConfigPath = "kiwi\Config";
-        if(class_exists($kiwiConfigPath)){
-            $kiwiConfigPath::handleRequest();
-        }
+            $cc = Container::getConfig(Routes::$route -> container);
+            $handling = Container::getHandling(Routes::$route -> container);
 
-        $cc = Container::getConfig(Routes::$route -> container);
-        if ($cc) {
-            $cc::handleRequest();
+            if ($handling) {
+                $handling::request();
+            }
 
-            if (isset($cc::$basicAuthority)) {
-                // basic authority
-                $postUser = null;
-                $postPass = null;
-                if(isset($_SERVER['PHP_AUTH_USER'])) {
-                    $postUser = $_SERVER['PHP_AUTH_USER'];
-                }
-                if(isset($_SERVER['PHP_AUTH_PW'])) {
-                    $postPass = $_SERVER['PHP_AUTH_PW'];
-                }
-                
-                $juge = false;
-                if ($postUser && $postPass) {
-                    if (
-                        $postUser == $cc::$basicAuthority["user"] && 
-                        $postPass == $cc::$basicAuthority["pass"]
-                    ) {
-                        $juge = true;
+            if ($cc) {
+                if (isset($cc::$basicAuthority)) {
+                    // basic authority
+                    $postUser = null;
+                    $postPass = null;
+                    if(isset($_SERVER['PHP_AUTH_USER'])) {
+                        $postUser = $_SERVER['PHP_AUTH_USER'];
                     }
-                }
-
-                if (!$juge) {
-                    header('WWW-Authenticate: Basic realm="Enter username and password."');
-                    header('Content-Type: text/plain; charset=utf-8');
-                    if (isset($cc::$basicAuthority["failed"])) {
-                        echo $cc::$basicAuthority["failed"];
+                    if(isset($_SERVER['PHP_AUTH_PW'])) {
+                        $postPass = $_SERVER['PHP_AUTH_PW'];
                     }
-                    exit;    
+                    
+                    $juge = false;
+                    if ($postUser && $postPass) {
+                        if (
+                            $postUser == $cc::$basicAuthority["user"] && 
+                            $postPass == $cc::$basicAuthority["pass"]
+                        ) {
+                            $juge = true;
+                        }
+                    }
+
+                    if (!$juge) {
+                        header('WWW-Authenticate: Basic realm="Enter username and password."');
+                        header('Content-Type: text/plain; charset=utf-8');
+                        if (isset($cc::$basicAuthority["failed"])) {
+                            echo $cc::$basicAuthority["failed"];
+                        }
+                        exit;    
+                    }
                 }
             }
-        }
 
-        if (!Routes::$route -> successed) {
-            self::error("Route Controller or Action not found.");
-        }
+            if (!Routes::$route -> successed) {
+                self::error("Route Controller or Action not found.");
+            }
 
-        $controllerPath = "\kiwi\\" . Routes::$route -> container . "\controllers\\". Kiwi::upFirst(Routes::$route -> controller) . "Controller";
+            $controllerPath = "\kiwi\\" . Routes::$route -> container . "\controllers\\". Kiwi::upFirst(Routes::$route -> controller) . "Controller";
 
-        if (!class_exists($controllerPath)) {
-            self::error("\"" . $controllerPath . "\" is not found");
-        }
+            if (!class_exists($controllerPath)) {
+                self::error("\"" . $controllerPath . "\" is not found");
+            }
 
-        // Controllerのインスタンスとセット
-        $c = new $controllerPath();
-        $c -> view = Routes::$route -> controller . "/" . Routes::$route -> action;
+            // Controllerのインスタンスとセット
+            $c = new $controllerPath();
+            $c -> view = Routes::$route -> controller . "/" . Routes::$route -> action;
 
-        $c -> handleBefore();
+            $c -> handleBefore();
 
-        if (!method_exists($c, Routes::$route -> action)) {
-            self::error("Action method not found");
-        }
+            if (!method_exists($c, Routes::$route -> action)) {
+                self::error("Action method not found");
+            }
 
-        // アクションメソッドの実行
-        if (Routes::$route -> aregments) {
-            // 引数がある場合
-            $c -> {Routes::$route -> action}(...Routes::$route -> aregments);
-        }
-        else {
-            // 引数が無い場合
-            $c -> {Routes::$route -> action}();
-        }
-
-        $c -> handleAfter();
-
-        // rendering
-        Rendering::$controllerDelegate = $c;
-        if ($c -> autoRender) {
-            if ($c -> viewTemplate) {
-                Rendering::viewTemplate();
+            // アクションメソッドの実行
+            if (Routes::$route -> aregments) {
+                // 引数がある場合
+                $c -> {Routes::$route -> action}(...Routes::$route -> aregments);
             }
             else {
-                Rendering::view();
+                // 引数が無い場合
+                $c -> {Routes::$route -> action}();
             }
+
+            $c -> handleAfter();
+
+            // rendering
+            Render::$controllerDelegate = $c;
+            if ($c -> autoRender) {
+                // autoRenderがtrueの場合
+                if ($c -> viewTemplate) {
+                    // viewTemplateがnullでない場合
+                    ViewTemplate::load();
+                }
+                else {
+                    // viewTemplateがnullの場合
+                    View::load();
+                }
+            }
+
+            $c -> handleDrawn();
+
+        } catch (Exception $e) {
+            self::showExceptionController($e);
         }
-
-        $c -> handleDrawn();
-
-        print(memory_get_peak_usage());
     }
 
     private static function showExceptionController (Exception $exception) {
@@ -163,32 +153,27 @@ class WebStartor {
             // Controllerのインスタンスとセット
             $c = new $controllerPath();
             $c -> view = "exception/index";
+            $c -> exception = $exception;
 
-            $c->handle($exception);
+            $c->handle();
 
             // rendering
-            Rendering::$controllerDelegate = $c;
+            Render::$controllerDelegate = $c;
+
             if ($c -> autoRender) {
                 if ($c -> viewTemplate) {
-                    Rendering::viewTemplate();
+                    ViewTemplate::load();
                 }
                 else {
-                    Rendering::view();
+                    View::load();
                 }
             }
 
             $c -> handleDrawn();
-
-
         } catch (Exception $e) {
-
+            echo $e;
         }
 
-    }
-
-    private static function showShell (){
-
- 
     }
 
     private static function error(string $errorMessage) : void {

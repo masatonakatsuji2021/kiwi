@@ -26,6 +26,7 @@
 namespace kiwi\core\configs;
 
 class Config {
+    
     /**
      * **Permitted domain list**  
      * Allow access only to the domains specified here.  

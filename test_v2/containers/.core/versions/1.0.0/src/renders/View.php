@@ -25,20 +25,43 @@
 
 namespace kiwi\core\renders;
 
+use kiwi\core\routes\Routes;
+
 class View extends Render {
 
-    
     /**
      * Viewファイルのロード
      */
-    public static function load(string $viewPath = null) : void {
+    public static function load(string $viewPath = null, bool $onResponse = false) : ?string {
+        if(!$viewPath) {
+            $container = Routes::$route -> container;
+            if (isset(self::$controllerDelegate -> viewOnContainer)) {
+                $container = self::$controllerDelegate -> viewOnContainer;
+            }
 
-    }
+            $jsonData = kiwiLoad();
+            $version = $jsonData["versions"][$container];
 
-    /**
-     * Viewファイルのレスポンス取得
-     */
-    public static function get(string $viewPath = null) : string {
-        return "";
+            if (isset(self::$controllerDelegate -> view)) {
+                $viewPath = KIWI_ROOT_CONTAINER . "/" . $container . "/versions/". $version. "/views/" . self::$controllerDelegate -> view . ".view";
+            }
+            else{
+                $viewPath = KIWI_ROOT_CONTAINER . "/" . $container . "/versions/". $version ."/views/" . Routes::$route -> controller . "/" . Routes::$route -> action . ".view";
+            }        
+        }
+
+        if (!file_exists($viewPath)) {
+            echo "[View Error] View file not found.";
+            return null;
+        }
+
+        if ($onResponse) {
+            ob_start();
+            require $viewPath;
+            return ob_get_clean();
+        }
+
+        require $viewPath;
+        return null;
     }
 }

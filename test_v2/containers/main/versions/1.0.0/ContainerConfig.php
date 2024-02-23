@@ -2,8 +2,7 @@
 
 namespace kiwi\main;
 
-use kiwi\core\ContainerConfig as CC;
-use kiwi\core\Kiwi;
+use kiwi\core\configs\ContainerConfig as CC;
 
 class ContainerConfig extends CC {
 

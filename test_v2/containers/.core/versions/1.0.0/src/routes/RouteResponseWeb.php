@@ -52,7 +52,7 @@ class RouteResponseWeb extends RouteResponse {
     /**
      * request method
      */
-    public RequestMethod $method;
+    public string $method;
 
     /**
      * request controller class

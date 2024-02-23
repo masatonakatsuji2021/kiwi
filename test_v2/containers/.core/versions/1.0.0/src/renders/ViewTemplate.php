@@ -25,20 +25,39 @@
 
 namespace kiwi\core\renders;
 
+
+use kiwi\core\routes\Routes;
+
 class ViewTemplate extends Render {
 
-        
     /**
      * ViewTemplateファイルのロード
      */
-    public static function load(string $viewTemplatePath = null) : void {
+    public static function load(string $viewTemplatePath = null, bool $onResponse = false) : ?string {
+        if (!$viewTemplatePath) {
+            $container = Routes::$route -> container;
+            if (isset(self::$controllerDelegate -> viewTemplateOnContainer)) {
+                $container = self::$controllerDelegate -> viewTemplateOnContainer;
+            }
 
-    }
+            $jsonData = kiwiLoad();
+            $version = $jsonData["versions"][$container];
 
-    /**
-     * ViewTemplateファイルのレスポンス取得
-     */
-    public static function get(string $viewTemplatePath = null) : string {
-        return "";
+            $viewTemplatePath = KIWI_ROOT_CONTAINER . "/" . $container . "/versions/". $version. "/viewTemplates/" . self::$controllerDelegate -> viewTemplate . ".view";
+        }
+
+        if (!file_exists($viewTemplatePath)) {
+            echo "[View Error] ViewTemplate file not found.";
+            return null;
+        }
+
+        if ($onResponse) {
+            ob_start();
+            require $viewTemplatePath;
+            return ob_get_clean();
+        }
+
+        require $viewTemplatePath;
+        return null;
     }
 }

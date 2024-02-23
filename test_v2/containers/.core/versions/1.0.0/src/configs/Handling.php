@@ -41,6 +41,11 @@ class Handling {
     }
 
     /**
+     * リクエスト受信後ハンドリング
+     */
+    public static function request() : void {}
+
+    /**
      * インストール時実行用ハンドリング
      */
     public static function install() : void{}

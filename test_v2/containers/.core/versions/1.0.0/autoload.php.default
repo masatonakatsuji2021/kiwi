@@ -24,7 +24,7 @@
  */
 
 $kiwiJson = null;
-function kiwiJsonLoad() {
+function kiwiLoad() {
     global $kiwiJson;
 
     if ($kiwiJson) {
@@ -47,7 +47,7 @@ function getNamespaceVersion(string $version) {
 
 spl_autoload_register(function(string $nameSpace) {
     
-    $json = kiwiJsonLoad();
+    $json = kiwiLoad();
 
     if (!defined("KIWI_ROOTDIR")) {
         define("KIWI_ROOTDIR", __DIR__);

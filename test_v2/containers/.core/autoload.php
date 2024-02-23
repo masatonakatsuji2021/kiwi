@@ -23,27 +23,19 @@
  * SOFTWARE.
  */
 
-$kiwiJson = null;
-function kiwiJsonLoad() {
-    global $kiwiJson;
+$kiwiData = null;
+function kiwiLoad() {
+    global $kiwiData;
 
-    if ($kiwiJson) {
-        return $kiwiJson;
+    if (!$kiwiData) {
+        $kiwiData = require KIWI_ROOTDIR . "/configs/Kiwi";
     }
-
-    $fs = fopen(KIWI_ROOTDIR . "/configs/kiwi.json", "r");
-    $content = "";
-    while ($line = fgets($fs)) {
-        $content .= $line;
-    }
-    fclose($fs);
-
-    return json_decode($content, true);
+    return $kiwiData;
 }
 
 spl_autoload_register(function(string $nameSpace) {
-    
-    $json = kiwiJsonLoad();
+
+    $kiwi = kiwiLoad();
 
     if (!defined("KIWI_ROOTDIR")) {
         define("KIWI_ROOTDIR", __DIR__);
@@ -72,11 +64,11 @@ spl_autoload_register(function(string $nameSpace) {
                 array_shift($spaces2);
             }
             else {
-                $version = $json["versions"]["core"];
+                $version = $kiwi["versions"]["core"];
             }
             $path = KIWI_ROOT_CONTAINER . "/.core/versions/" . $version . "/src/" . implode("/", $spaces2) . ".php";
         }
-        else if (isset($spaces[2])) {
+        else {
             $containerName = $spaces2[0];
             array_shift($spaces2);
 
@@ -90,17 +82,23 @@ spl_autoload_register(function(string $nameSpace) {
                 array_shift($spaces2);
             }
             else {
-                $version = $json["versions"][$containerName];
+                $version = $kiwi["versions"][$containerName];
             }
 
             $path = KIWI_ROOT_CONTAINER . "/" . $containerName . "/versions/" . $version . "/" . implode("/" , $spaces2) . ".php";
         }
-        else {
-            $path = KIWI_ROOTDIR . "/configs/" . implode("/" , $spaces2) . ".php";
-        }
 
         if (file_exists($path)) {
-            require $path;
+            require_once $path;
+        }
+    }
+    if ($spaces[0] == "kiwifw") {
+        $spaces2 = $spaces;
+        array_shift($spaces2);
+
+        $path = KIWI_ROOTDIR . "/" . implode("/" , $spaces2) . ".php";
+        if (file_exists($path)) {
+            require_once $path;
         }
     }
 

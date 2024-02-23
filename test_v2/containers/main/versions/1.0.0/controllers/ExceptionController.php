@@ -3,8 +3,8 @@
 namespace kiwi\main\controllers;
 
 use Exception;
-use kiwi\core\ExceptionController as EC;
-use kiwi\core\Rendering;
+use kiwi\core\controllers\ExceptionController as EC;
+use kiwi\core\renders\Render;
 
 class ExceptionController extends EC {
 
@@ -12,8 +12,8 @@ class ExceptionController extends EC {
     public string $viewTemplate = "def";
     public bool $autoRender = true;
 
-    public function handle(Exception $exp) : void {
-        Rendering::set("expTitle", $exp->getmessage());
+    public function handle() : void {
+        Render::set("expTitle", $this->exception->getmessage());
     }
 
 }

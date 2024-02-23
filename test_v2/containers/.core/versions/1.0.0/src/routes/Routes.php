@@ -27,6 +27,7 @@ namespace kiwi\core\routes;
 
 use Exception;
 use kiwi\core\configs\ContainerConfig;
+use kiwi\core\configs\Handling;
 use kiwi\core\containers\Container;
 
 class Routes {
@@ -98,21 +99,23 @@ class Routes {
         return $res;
     }
 
-    private static function routeResource(ContainerConfig $cc) : bool {
+    // Resource領域の経路探索
+    private static function routeResource(ContainerConfig $cc, Handling $handling = null) : bool {
         if (!isset($cc::$resources)) {
             return false;
         }
-        return self::routeResourceWritable("resources", $cc::$resources);
+        return self::routeResourceWritable("resources", $cc::$resources, $handling);
     }
 
-    private static function routeWritable(ContainerConfig $cc) : bool {
+    // Writable領域の経路探索
+    private static function routeWritable(ContainerConfig $cc, handling $handling = null) : bool {
         if (!isset($cc::$writables)) {
             return false;
         }
-        return self::routeResourceWritable("writables", $cc::$writables);
+        return self::routeResourceWritable("writables", $cc::$writables, $handling);
     }
 
-    private static function routeResourceWritable(string $type, array $routes) : bool {
+    private static function routeResourceWritable(string $type, array $routes, Handling $handling = null) : bool {
 
         $decision = null;
         foreach ($routes as $url => $r_) {
@@ -130,19 +133,30 @@ class Routes {
             return false;
         }
 
-        $path = str_replace("//", "/", KIWI_ROOT_CONTAINER . "/" . self::$route -> container . "/versions/" . self::$route -> containerVersion . "/" . $type . "/" . substr(self::$route -> url, strlen("/". self::$route -> container)));
+        if (isset($decision["cache-max-age"])) {
+            header("Cache-Control: max-age=" . $decision["cache-max-age"]);
+        }
 
+        $path = str_replace("//", "/", KIWI_ROOT_CONTAINER . "/" . self::$route -> container . "/versions/" . self::$route -> containerVersion . "/" . $type . "/" . substr(self::$route -> url, strlen("/". self::$route -> container)));
+        
         if (!file_exists($path)) {
+            http_response_code(404);
             return false;
         }
 
         $finfo = new \finfo(FILEINFO_MIME_TYPE);
         $mimeType = $finfo->file($path);
 
-        header("Content-Type: " . $mimeType);
-        if (isset($decision["cache-max-age"])) {
-            header("Cache-Control: max-age=" . $decision["cache-max-age"]);
+        if ($handling){
+            if ($type == "resource") {
+                $handling::resource();
+            }
+            else if ($type == "writable") {
+                $handling::writable();
+            }
         }
+
+        header("Content-Type: " . $mimeType);
 
         echo file_get_contents($path);
 
@@ -153,7 +167,7 @@ class Routes {
 
         self::getRequest();
 
-        $kiwiJson = kiwiJsonLoad();
+        $kiwiJson = kiwiLoad();
 
         // containerの検索
         $decisionContainer = null;
@@ -174,6 +188,7 @@ class Routes {
             throw new Exception("[Error] Container is Not Found.");
         }
 
+        // 各種Container情報のセット
         self::$route -> container = $decisionContainer;
         self::$route -> containerPath = KIWI_ROOT_CONTAINER . "/". $decisionContainer;
         self::$route -> containerVersion = $kiwiJson["versions"][$decisionContainer];
@@ -184,29 +199,35 @@ class Routes {
         self::$route -> url = $addUrl . self::$route -> url;
         self::$route -> url = str_replace("//", "/", self::$route -> url);
 
-        // 指定ContainerのContainerConfigクラスの存在を確認
+        // 指定ContainerのContainerConfigクラスを取得
         $cc = Container::getConfig($decisionContainer);
         if(!$cc){
             // ContainerConfigクラスがなければエラー
             throw new Exception("[initial Error] ContainerConfig class for specified Container not found.");
         }
 
+        // 指定ContainerのHandlingクラスを取得
+        $handling = Container::getHandling($decisionContainer);
+
         // resource data
-        $juge = self::routeResource($cc);
+        $juge = self::routeResource($cc, $handling);
         if ($juge){
             return false;
         }
 
         // writable data
-        $juge = Routes::routeWritable($cc);
+        $juge = Routes::routeWritable($cc, $handling);
         if ($juge) {
             return false;
         }
 
         // 経路探索のイベントハンドラ
-        $buff = $cc::handleRoute($cc::$routes);
-        if ($buff) {
-            $cc::$routes = $buff;
+        if ($handling) {
+            $buff = $handling::route($cc::$routes);
+            if ($buff) {
+                // 戻り値が用意されている場合はそれに差し替え
+                $cc::$routes = $buff;
+            }    
         }
 
         // 経路探索リストの正規化

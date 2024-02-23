@@ -1,7 +1,10 @@
+<?php
+use kiwi\core\renders\View;
+?>
 <header>
 <?php echo self::get("title"); ?>
 </header>
 <hr>
-<?php self::view(); ?>
+<?php View::load(); ?>
 <hr>
 <footer>Footer area....</footer>

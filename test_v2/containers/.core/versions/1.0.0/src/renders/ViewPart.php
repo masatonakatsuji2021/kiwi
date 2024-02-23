@@ -25,20 +25,38 @@
 
 namespace kiwi\core\renders;
 
+use kiwi\core\routes\Routes;
+
 class ViewPart extends Render {
 
         
     /**
      * ViewPartファイルのロード
      */
-    public static function load (string $viewPartPath) : void {
+    public static function load (string $viewPartPath, bool $onResponse = false) : ?string {
 
-    }
+        $container = Routes::$route -> container;
+        if (isset(self::$controllerDelegate -> viewPartOnContainer)) {
+            $container = self::$controllerDelegate -> viewPartOnContainer;
+        }
 
-    /**
-     * ViewPartファイルのレスポンス取得
-     */
-    public static function get (string $viewPartPath) : string {
-        return "";
+        $jsonData = kiwiLoad();
+        $version = $jsonData["versions"][$container];
+
+        $viewPartPath = KIWI_ROOT_CONTAINER . "/" . $container . "/versions/" . $version . "/viewParts/" . $viewPartPath . ".view";
+
+        if (!file_exists($viewPartPath)) {
+            echo "[View Error] ViewPart file not found.";
+            return null;
+        }
+
+        if ($onResponse) {
+            ob_start();
+            require $viewPartPath;
+            return ob_get_clean();
+        }
+
+        require $viewPartPath;
+        return null;
     }
 }

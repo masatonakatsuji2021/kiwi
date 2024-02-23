@@ -26,21 +26,33 @@
 namespace kiwi\core\containers;
 
 use kiwi\core\configs\ContainerConfig;
+use kiwi\core\configs\Handling;
 
 class Container {
 
     // ContainerConfigクラス取得
     public static function getConfig(string $containerName) : ?ContainerConfig {
 
-        $container = "\kiwi\\" . $containerName . "\ContainerConfig";
+        $classPath = "\kiwi\\" . $containerName . "\ContainerConfig";
                 
-        if (!class_exists($container)) {
+        if (!class_exists($classPath)) {
             return null;
         }
 
-        return new $container;
+        return new $classPath;
     }
     
+    // Handling クラス取得
+    public static function getHandling(string $containerName) : ?Handling {
+        $classPath = "\kiwi\\" . $containerName . "\Handling";
+
+        if (!class_exists($classPath)) {
+            return null;
+        }
+
+        return new $classPath;
+    }
+
     // インストール済Containerリスト取得
     public static function locals(array $options = null) : array {
         return [];  

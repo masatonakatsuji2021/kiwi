@@ -2,8 +2,8 @@
 
 namespace kiwi\main\controllers;
 
-use kiwi\core\Controller;
-use kiwi\core\Rendering;
+use kiwi\core\controllers\Controller;
+use kiwi\core\renders\Render;
 
 class MainController extends Controller {
 
@@ -13,7 +13,7 @@ class MainController extends Controller {
 //    public function handleBefore () : void {}
 
     public function index(){
-        Rendering::set("title","Main Page Title");
+        Render::set("title","Main Page Title");
     }
 
 //    public function handleAfter() : void {}
