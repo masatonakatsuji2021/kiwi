@@ -25,6 +25,7 @@
 
 namespace kiwi\core\containers;
 
+use kiwi\core\Kiwi;
 use kiwi\core\developments\PhpCodeMake;
 
 class ContainerDevelopment {
@@ -68,17 +69,33 @@ class ContainerDevelopment {
         echo "make  /" . $cco->name . "/versions/". $cco->version . "/versions/" . $cco->version . "/kiwiRelease.json" . "\n";
         file_put_contents(KIWI_ROOT_CONTAINER . "/". $cco->name . "/versions/" . $cco->version . "/kiwiRelease.json", json_encode($release, JSON_PRETTY_PRINT));
 
-        // update Kiwi 
+        // load kiwi file
         $kiwi = kiwiLoad();
 
+        // backup Kiwi file
+        rename(KIWI_ROOTDIR . "/configs/Kiwi", KIWI_ROOTDIR . "/configs/Kiwi.backup");
+
+        // update Kiwi
         $kiwi["routes"]["/" . $cco->name] = [
             "container" => $cco->name,
         ];
         $kiwi["versions"][$cco->name] = $cco->version;
 
         echo "update /configs/Kiwi\n";
-        file_put_contents(KIWI_ROOTDIR . "/configs/Kiwi.test", PhpCodeMake::createReturnArray($kiwi));
+        file_put_contents(KIWI_ROOTDIR . "/configs/Kiwi", PhpCodeMake::createReturnArray($kiwi));
 
+        // sample file copy
+        Kiwi::copy(
+            dirname(__DIR__) . "/consoles/createSample" , 
+            KIWI_ROOT_CONTAINER . "/" . $cco->name . "/versions/". $cco->version, 
+            true, 
+            function($path) use ($cco) {
+                echo "copy " . $path . "\n";
+                $content = file_get_contents($path);
+                $content = str_replace("xxxxxxxx", $cco->name, $content);
+                file_put_contents($path, $content);
+            }
+        );
 
         echo "\nCreate Complete!" . "\n";
         return true;

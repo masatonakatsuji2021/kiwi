@@ -27,6 +27,7 @@ namespace kiwi\core\consoles;
 
 use Exception;
 use kiwifw\configs\ProjectConfig;
+use kiwi\core\containers\Container;
 use kiwi\core\containers\ContainerCreateOption;
 use kiwi\core\containers\ContainerDevelopment;
 
@@ -83,10 +84,28 @@ class Incubator {
         while (!$value) {
             echo "Q. Container name? :";
             $value = trim(fgets(STDIN));
+
             if ($value == "") {
                 echo "[ERROR] Container name has not been entered. \n";
                 $value = null;
-            }    
+                continue;
+            }
+
+            if (
+                $value == "core" || 
+                $value == ".core"
+            ) {
+                // coreおよび.coreは不可
+                echo "[ERROR] This container cannot be created because it already exists. \n";
+                $value = null;
+                continue;
+            }
+
+            if (Container::getConfig($value)) {
+                echo "[ERROR] This container cannot be created because it already exists. \n";
+                $value = null;
+                continue;
+            }
         }
 
         $cco -> name = $value;

@@ -71,7 +71,7 @@ class Kiwi {
      * @param bool $deleteCopy = false If this value is true, copy will be performed after deletion.
      * @return bool Execution result 
      */
-    public static function copy(string $targetPath, string $copyPath, bool $deleteCopy = false) : bool {
+    public static function copy(string $targetPath, string $copyPath, bool $deleteCopy = false, callable $callback = null) : bool {
 
         if ($deleteCopy) {
             self::delete($copyPath);
@@ -93,6 +93,9 @@ class Kiwi {
             foreach ($targetFiles["file"] as $f_) {
                 $outputPath = $copyPath . substr($f_, strlen($targetPath));
                 $juge = copy($f_, $outputPath);
+                if ($callback) {
+                    $callback($outputPath);
+                }
                 if (!$juge) {
                     throw new Exception();
                 }

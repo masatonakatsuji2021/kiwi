@@ -1,0 +1,20 @@
+<?php
+use kiwi\core\renders\View;
+?>
+<!DOCTYPE html>
+<html>
+<head>
+<title><?php self::get("title"); ?></title>
+<style>
+body {
+    background:#ffefef;
+    margin:0;
+    padding:30px;
+    color:#444;
+}
+</style>
+</head>
+<body>
+<?php View::load(); ?>
+</body>
+</html>

@@ -33,6 +33,14 @@ class Container {
     // ContainerConfigクラス取得
     public static function getConfig(string $containerName) : ?ContainerConfig {
 
+        if (
+            $containerName == "core" ||
+            $containerName == ".core"
+        ) {
+            // coreおよび.coreは不可
+            return null;
+        }
+
         $classPath = "\kiwi\\" . $containerName . "\ContainerConfig";
                 
         if (!class_exists($classPath)) {

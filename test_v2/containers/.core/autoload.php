@@ -72,6 +72,7 @@ spl_autoload_register(function(string $nameSpace) {
             $containerName = $spaces2[0];
             array_shift($spaces2);
 
+            $version = null;
             if (strpos($spaces2[0], "ver_") === 0) {
                 $version = substr($spaces2[0], strlen("ver_"));
                 $version = implode(".", explode("_", $version));                
@@ -82,9 +83,14 @@ spl_autoload_register(function(string $nameSpace) {
                 array_shift($spaces2);
             }
             else {
-                $version = $kiwi["versions"][$containerName];
+                if (isset($kiwi["versions"][$containerName])) {
+                    $version = $kiwi["versions"][$containerName];
+                }
             }
 
+            if (!$version){
+                return;
+            }
             $path = KIWI_ROOT_CONTAINER . "/" . $containerName . "/versions/" . $version . "/" . implode("/" , $spaces2) . ".php";
         }
 
