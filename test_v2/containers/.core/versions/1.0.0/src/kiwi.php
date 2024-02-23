@@ -26,6 +26,7 @@
 namespace kiwi\core;
 
 use Exception;
+use kiwi\core\routes\Routes;
 
 /**
  * Kiwi Class
