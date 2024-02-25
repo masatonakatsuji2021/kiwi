@@ -71,6 +71,9 @@ class Incubator {
                 if ($sub == "create") {
                     $this->create();
                 }
+                else if ($sub == "versionup") {
+                    $this->versionUp();
+                }
             }
         }
     }
@@ -181,6 +184,13 @@ class Incubator {
         }
 
         $juge = ContainerDevelopment::create($cco);
+
+    }
+
+    private function versionUp() {
+        echo "[Kiwi Incubator Container VersionUp]\n\n";
+
+        
 
     }
 }

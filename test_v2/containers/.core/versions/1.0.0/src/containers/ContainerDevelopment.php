@@ -54,9 +54,11 @@ class ContainerDevelopment {
 
         // make kiwiContainer.json
         echo "make  /" . $cco->name . "/versions/". $cco->version . "/versions/" . $cco->version . "/kiwiContainer.json" . "\n";
-        file_put_contents(KIWI_ROOT_CONTAINER . "/". $cco->name . "/versions/" . $cco->version . "/kiwiContainer.json", json_encode((array)$cco, JSON_PRETTY_PRINT));
+        $ccoArray = (array)$cco;
+        $ccoArray["comment"] = "new release.";
+        file_put_contents(KIWI_ROOT_CONTAINER . "/". $cco->name . "/versions/" . $cco->version . "/kiwiContainer.json", json_encode($ccoArray, JSON_PRETTY_PRINT));
 
-        // make kiwiRelease.json
+        // make kiwiHistory.json
         $release = [
             [
                 "version" => $cco->version,
@@ -66,8 +68,8 @@ class ContainerDevelopment {
                 "comment" => "new release.",
             ],
         ];
-        echo "make  /" . $cco->name . "/versions/". $cco->version . "/versions/" . $cco->version . "/kiwiRelease.json" . "\n";
-        file_put_contents(KIWI_ROOT_CONTAINER . "/". $cco->name . "/versions/" . $cco->version . "/kiwiRelease.json", json_encode($release, JSON_PRETTY_PRINT));
+        echo "make  /" . $cco->name . "/versions/". $cco->version . "/versions/" . $cco->version . "/kiwiHistory.json" . "\n";
+        file_put_contents(KIWI_ROOT_CONTAINER . "/". $cco->name . "/versions/" . $cco->version . "/kiwiHistory.json", json_encode($release, JSON_PRETTY_PRINT));
 
         // load kiwi file
         $kiwi = kiwiLoad();

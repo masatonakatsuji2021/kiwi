@@ -99,23 +99,7 @@ class Routes {
         return $res;
     }
 
-    // Resource領域の経路探索
-    private static function routeResource(ContainerConfig $cc, Handling $handling = null) : bool {
-        if (!isset($cc::$resources)) {
-            return false;
-        }
-        return self::routeResourceWritable("resources", $cc::$resources, $handling);
-    }
-
-    // Writable領域の経路探索
-    private static function routeWritable(ContainerConfig $cc, handling $handling = null) : bool {
-        if (!isset($cc::$writables)) {
-            return false;
-        }
-        return self::routeResourceWritable("writables", $cc::$writables, $handling);
-    }
-
-    private static function routeResourceWritable(string $type, array $routes, Handling $handling = null) : bool {
+    private static function routeResourceWritable(bool $type, array $routes, Handling $handling = null) : bool {
 
         $decision = null;
         foreach ($routes as $url => $r_) {
@@ -137,8 +121,15 @@ class Routes {
             header("Cache-Control: max-age=" . $decision["cache-max-age"]);
         }
 
-        $path = str_replace("//", "/", KIWI_ROOT_CONTAINER . "/" . self::$route -> container . "/versions/" . self::$route -> containerVersion . "/" . $type . "/" . substr(self::$route -> url, strlen("/". self::$route -> container)));
-        
+        if ($type) {
+            $typeName = "resources";
+        }
+        else {
+            $typeName = "writables";
+        }
+
+        $path = str_replace("//", "/", KIWI_ROOT_CONTAINER . "/" . self::$route -> container . "/versions/" . self::$route -> containerVersion . "/" . $typeName . "/" . substr(self::$route -> url, strlen("/". self::$route -> container)));
+
         if (!file_exists($path)) {
             http_response_code(404);
             return false;
@@ -148,10 +139,10 @@ class Routes {
         $mimeType = $finfo->file($path);
 
         if ($handling){
-            if ($type == "resource") {
+            if ($type) {
                 $handling::resource();
             }
-            else if ($type == "writable") {
+            else {
                 $handling::writable();
             }
         }
@@ -210,15 +201,19 @@ class Routes {
         $handling = Container::getHandling($decisionContainer);
 
         // resource data
-        $juge = self::routeResource($cc, $handling);
-        if ($juge){
-            return false;
+        if (isset($cc::$resources)) {
+            $juge = self::routeResourceWritable(true, $cc::$resources, $handling);
+            if ($juge) {
+                return false;
+            }
         }
 
         // writable data
-        $juge = Routes::routeWritable($cc, $handling);
-        if ($juge) {
-            return false;
+        if (isset($cc::$writables)) {
+            $juge = self::routeResourceWritable(false, $cc::$writables, $handling);
+            if ($juge) {
+                return false;
+            }    
         }
 
         // 経路探索のイベントハンドラ

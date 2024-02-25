@@ -48,7 +48,7 @@ class WebStartor {
             if (!$res) {
                 return;
             }
-        
+
             $cc = Container::getConfig(Routes::$route -> container);
             $handling = Container::getHandling(Routes::$route -> container);
 

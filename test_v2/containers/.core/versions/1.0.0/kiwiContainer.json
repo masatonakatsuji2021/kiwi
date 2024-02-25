@@ -3,6 +3,7 @@
     "version": "1.0.0",
     "title": "kiwi core library",
     "description": "Kiwi framework core library packages.",
+    "comment": "new release.",
     "author": "Masato Nakatsuji",
     "homeUrl": "",
     "email": ""
