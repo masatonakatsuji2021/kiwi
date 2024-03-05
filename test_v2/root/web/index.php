@@ -32,7 +32,7 @@ define("KIWI_ROOTUNDERCUT", 2);
 define("KIWI_ROOTDIR", dirname(__DIR__, KIWI_ROOTUNDERCUT));
 
 // kiwi Core library autoload.
-require KIWI_ROOTDIR . "/containers/.core/autoload.php";
+require KIWI_ROOTDIR . "/containers/autoload.php";
 
 // Instantiate the WebStarter class of kiwi Core Library.
 new kiwi\core\WebStartor();

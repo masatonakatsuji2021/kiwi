@@ -63,38 +63,38 @@ class Resource {
         $container = Container::getConfig(self::$container);
 
         $target = null;
-        if ($type == ResourceType::Resource) {
-            $target = $container::$resources;            
-        }
-        else if ($type == ResourceType::Writable) {
-            $target = $container::$writables;
-        }
-        else if ($type == ResourceType::Temporary) {
-            
-        }
 
-        if (!$target) {
-            return null;
-        }
-        
-        $juge = false;
-        foreach ($target as $url => $r_) {
-            if (strpos($path . "/", $url . "/") === 0) {
-                $juge = $r_;
-                break;
+        if ($type !== ResourceType::Temporary) {
+            if ($type === ResourceType::Resource) {
+                $target = $container::$resources;            
             }
-        }
+            else if ($type === ResourceType::Writable) {
+                $target = $container::$writables;
+            }
 
-        if (!$juge) {
-            return null;
-        }
-
-        if (!isset($juge["release"])){
-            return null;
-        }
-
-        if (!$juge["release"]){
-            return null;
+            if (!$target) {
+                return null;
+            }
+            
+            $juge = false;
+            foreach ($target as $url => $r_) {
+                if (strpos($path . "/", $url . "/") === 0) {
+                    $juge = $r_;
+                    break;
+                }
+            }
+    
+            if (!$juge) {
+                return null;
+            }
+    
+            if (!isset($juge["release"])){
+                return null;
+            }
+    
+            if (!$juge["release"]){
+                return null;
+            }    
         }
 
         if ($type == ResourceType::Resource) {
@@ -346,19 +346,23 @@ class Writable extends Resource {
      */
     public static int $type = ResourceType::Writable;
 
+    /*
+    public static function getPath(string $path = null, int $type = ResourceType::Writable) : ?string {
+        return parent::getPath($path, $type);
+    }
+
+    */
+
     /**
      * 指定パスのディレクトリ作成
      */
     public static function mkdir (string $path) : bool {
         self::container();
-        $path = self::getPath($path, self::$type);
+        $path = self::getPath($path);
 
         if (!$path){
             return false;
         }
-        print_r([
-            $path,
-        ]);
 
         if (is_dir($path)) {
             return false;
@@ -371,8 +375,23 @@ class Writable extends Resource {
      * 指定パスのファイル・ディレクトリ削除
      */
     public static function remove (string $path) : bool {
+        self::container();
+        $path = self::getPath($path);
 
-        
+        if (!$path){
+            return false;
+        }
+
+        if (is_dir($path)) {
+            Kiwi::delete($path);
+        }
+        else {
+            if (!file_exists($path)) {
+                return false;
+            }
+            unlink($path);
+        }
+
         return true;
     }
     
@@ -380,20 +399,38 @@ class Writable extends Resource {
      * 指定パスへのファイル・ディレクトリのパス変更
      */
     public static function rename (string $beforePath, string $afterPath) : bool {
+        self::container();
+        $beforePath = self::getPath($beforePath, self::$type);
+        if (!$beforePath) {
+            return false;
+        }
+
+        $afterPath = self::getPath($afterPath, self::$type);
+        if (!$afterPath) {
+            return false;
+        }
+
+        if (!(file_exists($beforePath) || is_dir($beforePath))) {
+            return false;
+        }
+
+        if (file_exists($afterPath) || is_dir($afterPath)){
+            return false;
+        }
+        rename($beforePath, $afterPath);
         return true;
     }
 
     /**
      * 指定パスでのファイルの保存
      */
-    public static function save (string $path, string $contents) : bool {
-        return true;
-    }
-
-    /**
-     * 指定パスのファイルの追記
-     */
-    public static function append (string $path, string $addContents) : bool {
+    public static function save (string $filePath, string $contents, int $flags = 0) : bool {
+        self::container();
+        $filePath = self::getPath($filePath, self::$type);
+        if (!$filePath) {
+            return false;
+        }
+        file_put_contents($filePath, $contents, $flags);
         return true;
     }
 
@@ -401,6 +438,30 @@ class Writable extends Resource {
      * 指定パスのファイル・ディレクトリのコピー
      */
     public static function copy(string $inputPath, string $outputPath) : bool {
+        self::container();
+        $inputPath = self::getPath($inputPath, self::$type);
+        if (!$inputPath) {
+            return false;
+        }
+        $outputPath = self::getPath($outputPath, self::$type);
+        if (!$outputPath) {
+            return false;
+        } 
+
+        if (!(file_exists($inputPath) || is_dir($inputPath))) {
+            return false;
+        }
+
+        if (file_exists($outputPath) || is_dir($outputPath)) {
+            return false;
+        }
+
+        if (is_dir($inputPath)) {
+            Kiwi::copy($inputPath, $outputPath, true);
+        }
+        else {
+            copy($inputPath, $outputPath);
+        }
         return true;
     }
     
@@ -412,29 +473,12 @@ class Temporary extends Writable {
     /**
      * ResourceType (=Temporary)
      */
-    public static int $tyep = ResourceType::Temporary;
-    
-    /**
-     * 作業ディレクトリパス
-     */
-    public static string $path;
+    public static int $type = ResourceType::Temporary;
 
     /**
-     * 作業ディレクトリ識別子
+     * 指定パスのディレクトリ作成
      */
-    public static ?string $identifer = null;
-    
-    /**
-     * 作業ディレクトリ識別子の設定(一時作業ディレクトリ作成とディレクトリパス取得)
-     */
-    public static function make() : ?Temporary {
-        return null;
-    }
-    
-    /**
-     * 作業ディレクトリ識別子の解除(一時作業ディレクトリのデータ削除)
-     */
-    public static function clear() : bool {
-        return true;
+    public static function mkdir (string $path) : bool {
+        return parent::mkdir($path);
     }
 }

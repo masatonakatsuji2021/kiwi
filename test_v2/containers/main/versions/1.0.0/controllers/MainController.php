@@ -5,6 +5,7 @@ namespace kiwi\main\controllers;
 use kiwi\core\Controller;
 use kiwi\core\Render;
 use kiwi\core\Resource;
+use kiwi\core\Temporary;
 use kiwi\core\Writable;
 
 class MainController extends Controller {
@@ -45,7 +46,10 @@ class MainController extends Controller {
         */
 
         // Writable::mkdir("/public/writable_testmkdir");
-
+        // echo writable::remove("/public/deltestDir");
+       //  echo Writable::rename("/public/before_name.txt", "/public/after_name.txt");
+       // echo Writable::save("/public/save.txt", "save text...");
+       // echo Temporary::mkdir("/testdir..");
     }
 
 //    public function handleAfter() : void {}
