@@ -23,39 +23,21 @@
  * SOFTWARE.
  */
 
-namespace kiwi\core\routes;
+namespace kiwi\core;
 
-use Exception;
-
-class RouteResponse {
+class MigrationControl {
 
     /**
-     * request successed
+     * 指定バージョン間のアップグレードMigration実行
      */
-    public bool $successed;
+    public static function upgrade(string $startVersion, string $endVersion) : bool{
+        return true;
+    }
 
     /**
-     * container name
+     * 指定バージョン間のダウングレードMigration実行
      */
-    public string $container;
-
-    /**
-     * container version
-     */
-    public string $containerVersion;
-
-    /**
-     * container path
-     */
-    public string $containerPath;
-
-    /**
-     * aregments
-     */
-    public ?array $aregments = null;
-
-    /**
-     * error exception class
-     */
-    public Exception $exception;
+    public static function downgrade(string $startVersion, string $endVersion) : bool{
+        return true;
+    }
 }

@@ -23,13 +23,27 @@
  * SOFTWARE.
  */
 
-namespace kiwi\core\requests;
+namespace kiwi\core;
 
-class RequestMethod {
-    const Get = "GET";
-    const Post = "POST";
-    const Put = "PUT";
-    const Delete = "DELETE";
-    const Options = "OPTIONS";
-    const Other = null;
+class FookControl {
+
+    public static function load(string $fookName) : array {
+    
+        return [];
+    }
+
+    public static function loadOnContainer(string $containerName, string $fookName) {
+    
+        return;
+    }
+
+    public static function excute(string $fookName, string $methodName) : array {
+
+        return [];
+    }
+
+    public static function excuteonContainer(string $containerName, string $fookName, string $methodName) {
+
+        return;
+    }
 }

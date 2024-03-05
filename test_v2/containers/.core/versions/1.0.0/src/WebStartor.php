@@ -25,13 +25,16 @@
 
 namespace kiwi\core;
 
-use Exception;
-use kiwi\core\routes\Routes;
-use kiwi\core\containers\Container;
-use kiwi\core\renders\Render;
-use kiwi\core\renders\View;
-use kiwi\core\renders\ViewTemplate;
+require "Kiwi.php";
+require "Config.php";
+require "Routes.php";
+require "Container.php";
+require "Render.php";
+require "Resource.php";
+require "Controller.php";
+require "ExceptionController.php";
 
+use Exception;
 
 /**
  * WebStartor Class
@@ -42,6 +45,7 @@ class WebStartor {
      * constructor
      */
     public function __construct() {
+
         try {
             // 経路探索を開始
             $res = Routes::routeWeb();
@@ -127,16 +131,18 @@ class WebStartor {
                 // autoRenderがtrueの場合
                 if ($c -> viewTemplate) {
                     // viewTemplateがnullでない場合
-                    ViewTemplate::load();
+                    Render::loadTemplate();
                 }
                 else {
                     // viewTemplateがnullの場合
-                    View::load();
+                    Render::loadView();
                 }
             }
 
             $c -> handleDrawn();
 
+            global $start;
+            print_r("memoryUse = " . (memory_get_peak_usage() - $start)/1000 . "KB");
         } catch (Exception $e) {
             self::showExceptionController($e);
         }
@@ -162,10 +168,10 @@ class WebStartor {
 
             if ($c -> autoRender) {
                 if ($c -> viewTemplate) {
-                    ViewTemplate::load();
+                    Render::loadTemplate();
                 }
                 else {
-                    View::load();
+                    Render::loadView();
                 }
             }
 

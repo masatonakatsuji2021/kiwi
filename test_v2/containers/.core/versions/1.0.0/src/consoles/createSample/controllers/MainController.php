@@ -26,7 +26,7 @@
 namespace kiwi\xxxxxxxx\controllers;
 
 use kiwi\core\controllers\Controller;
-use kiwi\core\renders\Render;
+use kiwi\core\Render;
 
 class MainController extends Controller {
 

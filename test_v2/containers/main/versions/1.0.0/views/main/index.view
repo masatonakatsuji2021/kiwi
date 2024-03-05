@@ -1,2 +1,6 @@
 <h2>Hallo!</h2>
-<img src="./main/common/image1.png" style="width:100px">
+<img src="<?php echo self::url("/common/image1.png"); ?>" style="width:100px">
+<img src="<?php echo self::url("/public/cat26.jpg"); ?>" style="width:100px">
+
+<p><a href="<?php echo self::url("/page1"); ?>">page1 (autoRender = false)</a></p>
+<p><a href="<?php echo self::url("/page2"); ?>">page2 (get resource data)</a></p>

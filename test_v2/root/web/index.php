@@ -22,6 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+$start = memory_get_peak_usage();
 
  // On display errors
 ini_set("display_errors", true);

@@ -1,0 +1,10 @@
+{
+    "name": "main",
+    "version": "1.0.0",
+    "title": "kiwi main application",
+    "description": "Kiwi framework main application.",
+    "comment": "new release.",
+    "author": "Masato Nakatsuji",
+    "homeUrl": "",
+    "email": ""
+}

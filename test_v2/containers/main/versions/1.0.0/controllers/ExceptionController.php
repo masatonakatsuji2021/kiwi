@@ -3,8 +3,8 @@
 namespace kiwi\main\controllers;
 
 use Exception;
-use kiwi\core\controllers\ExceptionController as EC;
-use kiwi\core\renders\Render;
+use kiwi\core\ExceptionController as EC;
+use kiwi\core\Render;
 
 class ExceptionController extends EC {
 

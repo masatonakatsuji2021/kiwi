@@ -2,12 +2,14 @@
 
 namespace kiwi\main;
 
-use kiwi\core\configs\ContainerConfig as CC;
+use kiwi\core\ContainerConfig as CC;
 
 class ContainerConfig extends CC {
 
     public static array $routes = [
         "/" => "controller:main, action:index",
+        "/page1" => "controller:main, action:page1",
+        "/page2" => "controller:main, action:page2",
         "/sub" => [
             "/" => "controller:sub, action:index",
             "/detail/{id}" => "controller:sub, action:detail",
@@ -19,6 +21,18 @@ class ContainerConfig extends CC {
         "/common" => [
             "release" => true,
             "cache-max-age" => 3600,
+        ],
+        /*
+        "/common_v2" => [
+            "release" => true,
+        ],
+        */
+    ];
+
+    public static array $writables = [
+        "/public" => [
+            "release" => true,
+            "cache-max-age" => 60,
         ],
     ];
 

@@ -23,20 +23,21 @@
  * SOFTWARE.
  */
 
-namespace kiwi\core\routes;
+namespace kiwi\core;
 
-class RouteResponseConsole extends RouteResponse{
+use Exception;
 
-    public array $commands;
-
-    /**
-     * command shell class
-     */
-    public string $shell;
+class ExceptionController extends Controller {
 
     /**
-     * command action
+     * Exception Class Object
      */
-    public string $action;
-    
+    public Exception $exception;
+
+    /**
+     * Error handle method
+     */
+    public function handle() : void {
+        echo $this->exception;
+    }
 }

@@ -34,6 +34,7 @@ function kiwiLoad() {
 }
 
 spl_autoload_register(function(string $nameSpace) {
+    global $start;
 
     $kiwi = kiwiLoad();
 

@@ -23,19 +23,11 @@
  * SOFTWARE.
  */
 
-namespace kiwi\core\configs;
+ namespace kiwi\core;
 
-class Config {
-    
-    /**
-     * **Permitted domain list**  
-     * Allow access only to the domains specified here.  
-     * If not specified, access will be possible from any domain.
-     */
-    public static array $domains;
+ class Fook {
 
-    /**
-     * **basic authoricate setting**
-     */
-    public static array $basicAuthority;
-}
+    public function run() {
+        return null;
+    }
+ }

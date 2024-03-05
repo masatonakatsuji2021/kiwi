@@ -23,36 +23,25 @@
  * SOFTWARE.
  */
 
-namespace kiwi\core\resources;
+namespace kiwi\core;
 
-class Temporary extends Writable {
+class Controller {
+    
+    public string $viewTemplate;
 
-    /**
-     * ResourceType (=Temporary)
-     */
-    public static ResourceType $tyep = ResourceType::Temporary;
-    
-    /**
-     * 作業ディレクトリパス
-     */
-    public static string $path;
+    public string $view;
 
-    /**
-     * 作業ディレクトリ識別子
-     */
-    public static string $identifer = null;
+    public string $viewOnContainer;
+
+    public string $viewTemplateOnContainer;
     
-    /**
-     * 作業ディレクトリ識別子の設定(一時作業ディレクトリ作成とディレクトリパス取得)
-     */
-    public static function make() : ?Temporary {
-        return null;
-    }
-    
-    /**
-     * 作業ディレクトリ識別子の解除(一時作業ディレクトリのデータ削除)
-     */
-    public static function clear() : bool {
-        return true;
-    }
+    public string $viewPartOnContainer;
+
+    public bool $autoRender = false;
+
+    public function handleBefore() : void {}
+
+    public function handleAfter() : void {}
+
+    public function handleDrawn() : void {}
 }

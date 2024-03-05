@@ -52,13 +52,14 @@ class ContainerDevelopment {
         echo "mkdir /" . $cco->name . "/versions/". $cco->version . "\n";
         mkdir(KIWI_ROOT_CONTAINER . "/" . $cco->name . "/versions/". $cco->version);
 
-        // make kiwiContainer.json
-        echo "make  /" . $cco->name . "/versions/". $cco->version . "/versions/" . $cco->version . "/kiwiContainer.json" . "\n";
+        // make container.json
+        echo "make  /" . $cco->name . "/versions/". $cco->version . "/versions/" . $cco->version . "/container.json" . "\n";
         $ccoArray = (array)$cco;
         $ccoArray["comment"] = "new release.";
-        file_put_contents(KIWI_ROOT_CONTAINER . "/". $cco->name . "/versions/" . $cco->version . "/kiwiContainer.json", json_encode($ccoArray, JSON_PRETTY_PRINT));
+        file_put_contents(KIWI_ROOT_CONTAINER . "/". $cco->name . "/versions/" . $cco->version . "/container.json", json_encode($ccoArray, JSON_PRETTY_PRINT));
 
-        // make kiwiHistory.json
+        // make history.json
+        /*
         $release = [
             [
                 "version" => $cco->version,
@@ -68,8 +69,9 @@ class ContainerDevelopment {
                 "comment" => "new release.",
             ],
         ];
-        echo "make  /" . $cco->name . "/versions/". $cco->version . "/versions/" . $cco->version . "/kiwiHistory.json" . "\n";
-        file_put_contents(KIWI_ROOT_CONTAINER . "/". $cco->name . "/versions/" . $cco->version . "/kiwiHistory.json", json_encode($release, JSON_PRETTY_PRINT));
+        echo "make  /" . $cco->name . "/versions/". $cco->version . "/versions/" . $cco->version . "/history.json" . "\n";
+        file_put_contents(KIWI_ROOT_CONTAINER . "/". $cco->name . "/versions/" . $cco->version . "/history.json", json_encode($release, JSON_PRETTY_PRINT));
+        */
 
         // load kiwi file
         $kiwi = kiwiLoad();
@@ -107,6 +109,9 @@ class ContainerDevelopment {
      * Containerの次バージョン追加
      */
     public static function versionUp(ContainerVersionUpOption $containerVersionUpOption) : bool {
+
+        echo "version up....";
+
         return true;
     }
 }

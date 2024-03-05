@@ -2,8 +2,10 @@
 
 namespace kiwi\main\controllers;
 
-use kiwi\core\controllers\Controller;
-use kiwi\core\renders\Render;
+use kiwi\core\Controller;
+use kiwi\core\Render;
+use kiwi\core\Resource;
+use kiwi\core\Writable;
 
 class MainController extends Controller {
 
@@ -12,11 +14,41 @@ class MainController extends Controller {
 
 //    public function handleBefore () : void {}
 
-    public function index(){
+    public function index() {
         Render::set("title","Main Page Title");
+    }
+
+    public function page1() {
+        $this->autoRender = false;
+
+        echo "Page1 ok....";
+    }
+
+    public function page2() {
+        $this->autoRender = false;
+
+        /*
+        echo Resource::exists("/common/image1.png");
+        echo "<br>";
+        echo Resource::isDirectory("/common/abc");
+        echo "<br>";
+        echo Resource::isDirectory("/common/image1.png2");
+        echo "<br>";
+        echo Resource::isFile("/common/image1.png");
+        echo "<br>";
+        */
+//        print_r(Resource::lists("/common"));
+/*
+        $get = Resource::get("/common/image1.png");
+        header("Content-Type: ". $get->mimeType);
+        echo $get->raw();
+        */
+
+        // Writable::mkdir("/public/writable_testmkdir");
+
     }
 
 //    public function handleAfter() : void {}
 
-    // public function handleDrawn() : void {    }
+    // public function handleDrawn() : void {}
 }

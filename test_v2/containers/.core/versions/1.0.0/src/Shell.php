@@ -23,17 +23,11 @@
  * SOFTWARE.
  */
 
-namespace kiwi\core\configs;
+namespace kiwi\core;
 
-class ProjectConfig extends Config {
+class SHell {
 
-    /**
-     * Enabling and disabling commander commands.
-     */
-    public static bool $useCommander = false;
+    public function handleBefore() : void {}
 
-    /**
-     * Enabling and disabling incubator commands
-     */    
-    public static bool $useIncubator = false;
+    public function handleAfter() : void {}
 }

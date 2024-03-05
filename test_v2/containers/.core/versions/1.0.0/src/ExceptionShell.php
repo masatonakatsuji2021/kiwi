@@ -23,19 +23,21 @@
  * SOFTWARE.
  */
 
-namespace kiwi\core\requests;
+ namespace kiwi\core;
 
-class Request {
+ use Exception;
+
+ class ExceptionShell extends Shell {
+
+   /**
+     * Exception Class Object
+     */
+    public Exception $exception;
 
     /**
-     * Request Method (Get\Post\Put\Delete\Option\Other)
+     * Error handle method
      */
-    public static RequestMethod $method = RequestMethod::Other;
-
-    /**
-     * リクエストデータ取得
-     */
-    public static function get(string $name = null) : array {
-        return [];
+    public function handle() : void {
+        echo $this->exception;
     }
-}
+ }

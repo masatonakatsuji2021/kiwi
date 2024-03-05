@@ -23,41 +23,17 @@
  * SOFTWARE.
  */
 
-namespace kiwi\core\renders;
+namespace kiwi\core;
 
-
-use kiwi\core\routes\Routes;
-
-class ViewTemplate extends Render {
+class Migration {
 
     /**
-     * ViewTemplateファイルのロード
+     * アップグレード実行用イベント
      */
-    public static function load(string $viewTemplatePath = null, bool $onResponse = false) : ?string {
-        if (!$viewTemplatePath) {
-            $container = Routes::$route -> container;
-            if (isset(self::$controllerDelegate -> viewTemplateOnContainer)) {
-                $container = self::$controllerDelegate -> viewTemplateOnContainer;
-            }
+    public function upgrade() : void {}
 
-            $jsonData = kiwiLoad();
-            $version = $jsonData["versions"][$container];
-
-            $viewTemplatePath = KIWI_ROOT_CONTAINER . "/" . $container . "/versions/". $version. "/viewTemplates/" . self::$controllerDelegate -> viewTemplate . ".view";
-        }
-
-        if (!file_exists($viewTemplatePath)) {
-            echo "[View Error] ViewTemplate file not found.";
-            return null;
-        }
-
-        if ($onResponse) {
-            ob_start();
-            require $viewTemplatePath;
-            return ob_get_clean();
-        }
-
-        require $viewTemplatePath;
-        return null;
-    }
+    /**
+     * ダウングレード実行用イベント
+     */
+    public function downgrade() : void {}
 }

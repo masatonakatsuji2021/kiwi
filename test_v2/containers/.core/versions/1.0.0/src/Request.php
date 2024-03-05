@@ -23,21 +23,68 @@
  * SOFTWARE.
  */
 
-namespace kiwi\core\migrations;
+namespace kiwi\core;
 
-class MigrationStatic {
-
-    /**
-     * 指定バージョン間のアップグレードMigration実行
-     */
-    public static function upgrade(string $startVersion, string $endVersion) : bool{
-        return true;
-    }
+class Request {
 
     /**
-     * 指定バージョン間のダウングレードMigration実行
+     * Request Method (Get\Post\Put\Delete\Option\Other)
      */
-    public static function downgrade(string $startVersion, string $endVersion) : bool{
-        return true;
+    public static RequestMethod $method = RequestMethod::Other;
+
+    /**
+     * リクエストデータ取得
+     */
+    public static function get(string $name = null) : array {
+        return [];
     }
+}
+
+class RequestMethod {
+    const Get = "GET";
+    const Post = "POST";
+    const Put = "PUT";
+    const Delete = "DELETE";
+    const Options = "OPTIONS";
+    const Other = null;
+}
+
+class Get extends Request {
+
+    /**
+     * Request Method (= GET)
+     */
+    public static RequestMethod $method = RequestMethod::Get;
+}
+
+class Post extends Request {
+
+    /**
+     * Request Method (= POST)
+     */
+    public static RequestMethod $method = RequestMethod::Post;
+}
+
+class Put extends Request {
+
+    /**
+     * Request Method (= PUT)
+     */
+    public static RequestMethod $method = RequestMethod::Put;
+}
+
+class Options extends Request {
+
+    /**
+     * Request Method (= OPTIONS)
+     */
+    public static RequestMethod $method = RequestMethod::Options;
+}
+
+class Delete extends Request {
+
+    /**
+     * Request Method (= DELETE)
+     */
+    public static RequestMethod $method = RequestMethod::Delete;
 }

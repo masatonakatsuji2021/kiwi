@@ -23,12 +23,15 @@
  * SOFTWARE.
  */
 
-namespace kiwi\core\containers;
+namespace kiwi\core;
 
-use kiwi\core\configs\ContainerConfig;
-use kiwi\core\configs\Handling;
+use kiwi\core\ContainerConfig;
+use kiwi\core\Handling;
 
 class Container {
+
+    private static $configBuffer = [];
+    private static $handlingBuffer = [];
 
     // ContainerConfigクラス取得
     public static function getConfig(string $containerName) : ?ContainerConfig {
@@ -41,54 +44,66 @@ class Container {
             return null;
         }
 
+        if (isset(self::$configBuffer[$containerName])) {
+            return self::$configBuffer[$containerName];
+        }
+
         $classPath = "\kiwi\\" . $containerName . "\ContainerConfig";
                 
         if (!class_exists($classPath)) {
+            self::$configBuffer[$containerName] = null;
             return null;
         }
 
-        return new $classPath;
+        $config = new $classPath;
+        self::$configBuffer[$containerName] = $config;
+
+        return $config;
     }
     
     // Handling クラス取得
     public static function getHandling(string $containerName) : ?Handling {
-        $classPath = "\kiwi\\" . $containerName . "\Handling";
-
-        if (!class_exists($classPath)) {
+        
+        if (
+            $containerName == "core" ||
+            $containerName == ".core"
+        ) {
+            // coreおよび.coreは不可
             return null;
         }
 
-        return new $classPath;
+        if (isset(self::$handlingBuffer[$containerName])) {
+            return self::$handlingBuffer[$containerName];
+        }
+
+        $classPath = "\kiwi\\" . $containerName . "\Handling";
+
+        if (!class_exists($classPath)) {
+            self::$handlingBuffer[$containerName] = null;
+            return null;
+        }
+        
+        $handling = new $classPath;
+        self::$handlingBuffer[$containerName] = $handling;
+
+        return $handling;
     }
 
-    // インストール済Containerリスト取得
-    public static function locals(array $options = null) : array {
-        return [];  
-    }
-    
-    // 指定Container名のインストール済Container取得
-    public static function local(string $ContainerName) : ?LocalContainer{
-        return null;
-    }
-    
-    // 指定リポジトリ情報での最新版RemoteContainer取得
-    public static function remote(ContainerRepository $containerRepository) : ?RemoteContainer {
-        return null;
-    }
-    
-    // 指定Containerのバージョンデータリスト取得
-    public static function versions(string $containerName) : ?array {
-        return [];
-    }
+    /**
+     * get kiwi container data
+     */
+    public static function getKiwi(string $containerName) : ?array {
 
-    // 指定Container, バージョン番号のバージョンデータContainerの取得
-    public static function getVersion(string $ContainerName, string $version) : ?VersionContainer {
-        return null;
-    }
+        $kiwi = kiwiLoad();
+        if(!isset($kiwi["versions"][$containerName])){
+            return null;
+        }
 
-    // 指定Containerファイルをバージョンデータへセット
-    public static function setVersion(string $containerName, string $containerFilePath) : bool {
-        return true;
-    }    
+        $path = KIWI_ROOT_CONTAINER . "/" . $containerName . "/versions/" . $kiwi["versions"][$containerName] . "/container.json";
+
+        $getKiwi = json_decode(file_get_contents($path), true);
+
+        return $getKiwi;
+    }
 }
 

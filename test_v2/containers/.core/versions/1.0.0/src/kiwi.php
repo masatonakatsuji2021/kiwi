@@ -26,14 +26,13 @@
 namespace kiwi\core;
 
 use Exception;
-use kiwi\core\routes\Routes;
+use kiwi\core\Routes;
 
 /**
  * Kiwi Class
  */
 class Kiwi {
 
-    // 
     /**
      * Deepest directory search
      * @param string $path search directory path
@@ -155,8 +154,11 @@ class Kiwi {
      * @param string $version version number string
      * @return int version number integer value
      */
-    public static function versionOnInteger(string $version) : int {
+    public static function versionOnInteger(string $version) : ?int {        
         $versions = explode(".", $version);
+        if (count($versions) != 3){
+            return null;
+        }
         $val = sprintf("%02d",$versions[0]) . sprintf("%02d", $versions[1]) . sprintf("%02d", $versions[2]); 
         return intval($val);
     }
@@ -171,6 +173,40 @@ class Kiwi {
         return intval(substr($verStr, 0, 2)) . "." . intval(substr($verStr, 2, 2)). "." . intval(substr($verStr, 4, 2));
     }
 
+    /**
+     * next patch version
+     */
+    public static function nextPatchVersion(string $versionString) : string {
+        $version = self::versionOnInteger($versionString);
+        $version += 1;
+        return self::versionOnString($version);
+    }
+
+    /**
+     * next minor version
+     */
+    public static function nextMinorVersion(string $versionString) : string {
+        $versions = explode(".", $versionString);
+        $versions[2] = "0";
+        $versionString = implode(".", $versions);
+        $version = self::versionOnInteger($versionString);
+        $version += 100;
+        return self::versionOnString($version);
+    }
+
+    /**
+     * next major version
+     */
+    public static function nextMajorVersion(string $versionString) : string {
+        $versions = explode(".", $versionString);
+        $versions[1] = "0";
+        $versions[2] = "0";
+        $versionString = implode(".", $versions);
+        $version = self::versionOnInteger($versionString);
+        $version += 10000;
+        return self::versionOnString($version);
+    }
+    
     /**
      * Load env file
      * @param string $filePath env file path

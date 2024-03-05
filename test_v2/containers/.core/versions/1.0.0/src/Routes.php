@@ -23,12 +23,11 @@
  * SOFTWARE.
  */
 
-namespace kiwi\core\routes;
+namespace kiwi\core;
 
 use Exception;
-use kiwi\core\configs\ContainerConfig;
-use kiwi\core\configs\Handling;
-use kiwi\core\containers\Container;
+use kiwi\core\Handling;
+use kiwi\core\Container;
 
 class Routes {
 
@@ -99,16 +98,18 @@ class Routes {
         return $res;
     }
 
+    /**
+     * route resource or writable file load
+     */
     private static function routeResourceWritable(bool $type, array $routes, Handling $handling = null) : bool {
 
         $decision = null;
-        foreach ($routes as $url => $r_) {
-            $targetUrl = "/" . self::$route -> container . $url;
-            if (strpos(self::$route -> url, $targetUrl) === 0) {
+        foreach ($routes as $url => $r_ ) {
+            if (strpos(self::$route -> url, $url . "/") === 0 ){
                 $decision = $r_;
             }
         }
-
+        
         if (!$decision) {
             return false;
         }
@@ -122,17 +123,17 @@ class Routes {
         }
 
         if ($type) {
-            $typeName = "resources";
+            // is resource
+            $path = str_replace("//", "/", KIWI_ROOT_CONTAINER . "/" . self::$route -> container . "/versions/" . self::$route -> containerVersion . "/resources/" . self::$route -> url);
         }
         else {
-            $typeName = "writables";
+            // is writable
+            $path = str_replace("//", "/", KIWI_ROOT_CONTAINER . "/" . self::$route -> container . "/writables/" . self::$route -> url);
         }
-
-        $path = str_replace("//", "/", KIWI_ROOT_CONTAINER . "/" . self::$route -> container . "/versions/" . self::$route -> containerVersion . "/" . $typeName . "/" . substr(self::$route -> url, strlen("/". self::$route -> container)));
 
         if (!file_exists($path)) {
             http_response_code(404);
-            return false;
+            return true;
         }
 
         $finfo = new \finfo(FILEINFO_MIME_TYPE);
@@ -154,13 +155,13 @@ class Routes {
         return true;
     }
 
-    public static function routeWeb() : bool {
-
-        self::getRequest();
+    /**
+     * set route container
+     */
+    private static function setContainer() : ?string {
 
         $kiwiJson = kiwiLoad();
 
-        // containerの検索
         $decisionContainer = null;
         $changeUrl = null;
         $addUrl = null;
@@ -173,10 +174,8 @@ class Routes {
                 }
             }
         }
-
         if (!$decisionContainer) {
-            // decisionContainer がnullの場合はエラー
-            throw new Exception("[Error] Container is Not Found.");
+            return null;
         }
 
         // 各種Container情報のセット
@@ -190,15 +189,31 @@ class Routes {
         self::$route -> url = $addUrl . self::$route -> url;
         self::$route -> url = str_replace("//", "/", self::$route -> url);
 
+        return $decisionContainer;
+    }
+
+    public static function routeWeb() : bool {
+
+        // リクエストの取得
+        self::getRequest();
+
+        // containerの検索
+        $container = self::setContainer();
+
+        if (!$container) {
+            // decisionContainer がnullの場合はエラー
+            throw new Exception("[Error] Container is Not Found.");
+        }
+
         // 指定ContainerのContainerConfigクラスを取得
-        $cc = Container::getConfig($decisionContainer);
+        $cc = Container::getConfig($container);
         if(!$cc){
             // ContainerConfigクラスがなければエラー
             throw new Exception("[initial Error] ContainerConfig class for specified Container not found.");
         }
 
         // 指定ContainerのHandlingクラスを取得
-        $handling = Container::getHandling($decisionContainer);
+        $handling = Container::getHandling($container);
 
         // resource data
         if (isset($cc::$resources)) {
@@ -361,5 +376,128 @@ class Routes {
         else {
             self::$route -> successed = false;
         }
+    }
+}
+
+
+class RouteResponse {
+
+    /**
+     * request successed
+     */
+    public bool $successed;
+
+    /**
+     * container name
+     */
+    public string $container;
+
+    /**
+     * container version
+     */
+    public string $containerVersion;
+
+    /**
+     * container path
+     */
+    public string $containerPath;
+
+    /**
+     * aregments
+     */
+    public ?array $aregments = null;
+
+    /**
+     * error exception class
+     */
+    public Exception $exception;
+}
+
+class RouteResponseConsole extends RouteResponse{
+
+    public array $commands;
+
+    /**
+     * command shell class
+     */
+    public string $shell;
+
+    /**
+     * command action
+     */
+    public string $action;
+    
+}
+
+
+class RouteResponseWeb extends RouteResponse {
+    
+    /**
+     * access domain
+     */
+    public string $domain;
+
+    /**
+     * full Url
+     */
+    public string $full;
+
+    /**
+     * remote IP Address
+     */
+    public string $ip;
+
+    /**
+     * request URL
+     */
+    public string $url;
+
+    /**
+     * request method
+     */
+    public string $method;
+
+    /**
+     * request controller class
+     */
+    public string $controller;
+    
+    /**
+     * request action
+     */
+    public string $action;
+}
+
+class RouteSet {
+
+    public static function add(string $method, string $controller, string $action = null) : string {
+        if ($method) {
+            $str = "method:" .$method . ", controller:". $controller;
+        }
+        else {
+            $str = "controller:". $controller. ", action:" . $action;
+        }
+
+        if ($action) {
+            $str .= ", action:" . $action;
+        }
+
+        return $str;
+    }
+
+    public static function get(string $controller, string $action = null) : string{
+        return self::add("get", $controller, $action);
+    }
+
+    public static function post(string $controller, string $action = null) : string{
+        return self::add("post", $controller, $action);
+    }
+
+    public static function put(string $controller, string $action = null) : string{
+        return self::add("put", $controller, $action);
+    }
+
+    public static function delete(string $controller, string $action = null) : string{
+        return self::add("delete", $controller, $action);
     }
 }

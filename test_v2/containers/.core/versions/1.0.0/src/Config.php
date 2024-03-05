@@ -23,7 +23,50 @@
  * SOFTWARE.
  */
 
-namespace kiwi\core\configs;
+namespace kiwi\core;
+
+class Config {
+    
+    /**
+     * **Permitted domain list**  
+     * Allow access only to the domains specified here.  
+     * If not specified, access will be possible from any domain.
+     */
+    public static array $domains;
+
+    /**
+     * **basic authoricate setting**
+     */
+    public static array $basicAuthority;
+}
+
+
+class ContainerConfig extends Config{
+
+    /**
+     * **Web Routing List**
+     * This is a route search list for each URL on the web.
+     */
+    public static array $routes = [];
+
+    /**
+     * **Console Routing List**  
+     * This is the route search list for each path when running the console.
+     */
+    public static array $routeShells;
+
+
+    /**
+     * **Resource data access settings**
+     */
+    public static array $resources;
+
+    /**
+     * 
+     */
+    public static array $writables;
+}
+
 
 class Handling {
     /**
@@ -104,4 +147,18 @@ class Handling {
      * 書込可能データアクセス時ハンドリング
      */
     public static function writable() : void {}
+}
+
+
+class ProjectConfig extends Config {
+
+    /**
+     * Enabling and disabling commander commands.
+     */
+    public static bool $useCommander = false;
+
+    /**
+     * Enabling and disabling incubator commands
+     */    
+    public static bool $useIncubator = false;
 }

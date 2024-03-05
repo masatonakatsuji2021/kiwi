@@ -26,5 +26,9 @@
 namespace kiwi\core\containers;
 
 class ContainerVersionUpOption {
-
+    public string $name;
+    public string $nowVersion;
+    public string $nextVersion;
+    public string $nextVersionType;
+    public bool $directoryCopy;
 }

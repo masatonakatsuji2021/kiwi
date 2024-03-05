@@ -27,11 +27,11 @@ namespace kiwi\core\consoles;
 
 use Exception;
 use kiwifw\configs\ProjectConfig;
+use kiwi\core\Kiwi;
 use kiwi\core\containers\Container;
 use kiwi\core\containers\ContainerCreateOption;
 use kiwi\core\containers\ContainerDevelopment;
-
-
+use kiwi\core\containers\ContainerVersionUpOption;
 use kiwi\core\developments\PhpCodeMake;
 
 
@@ -71,8 +71,17 @@ class Incubator {
                 if ($sub == "create") {
                     $this->create();
                 }
-                else if ($sub == "versionup") {
+                else if ($sub == "versionup" || $sub == "vup") {
                     $this->versionUp();
+                }
+                else if ($sub == "switch") {
+                    $this->switch();
+                }
+                else if ($sub == "commit") {
+                    $this->commit();
+                }
+                else if ($sub == "export") {
+                    $this->export();
                 }
             }
         }
@@ -190,7 +199,125 @@ class Incubator {
     private function versionUp() {
         echo "[Kiwi Incubator Container VersionUp]\n\n";
 
-        
+        $cvo = new ContainerVersionUpOption();
 
+        $value = null;
+
+        while (!$value) {
+            echo "Q. コンテナ名を入力 :";
+            $value = trim(fgets(STDIN));
+            if ($value == ""){
+                echo "[ERROR] コンテナ名が未入力です。\n";
+                $value = null;
+                continue;
+             }
+
+             if (
+                $value == ".core" ||
+                $value == "core"
+             ){
+                echo "[ERROR] このコンテナ名は利用できません\n";
+                $value = null;
+                continue;
+             }
+
+             if (!Container::getConfig($value)) {
+                echo "[ERROR] このコンテナ名のコンテナはインストールされていません \n";
+                $value = null;
+                continue;
+            }
+        }
+
+        $cvo -> name = $value;
+
+        $kiwi = Container::getKiwi($value);
+
+        $nowVersion = $kiwi["version"];
+        $nowVersion = "1.3.12";
+        $patchVersion = Kiwi::nextPatchVersion($nowVersion);
+        $minorVersion = Kiwi::nextMinorVersion($nowVersion);
+        $majorVersion = Kiwi::nextMajorVersion($nowVersion);
+        
+        echo "予定しているバージョン番号\n\n";
+
+        echo "  Patch Version   : " . $patchVersion . "\n";
+        echo "  Minor Version   : " . $minorVersion . "\n";
+        echo "  Major Version   : " . $majorVersion . "\n\n";
+
+        $value = null;
+        while (!$value) {
+            echo "Q. アップグレードするバージョン種類を入力 [patch/minor/major] (patch) :";
+            $value = trim(fgets(STDIN));
+
+            if ($value == ""){
+                $value = "patch";
+            }
+
+            if (!($value == "patch" || $value == "minor" || $value == "major")){
+                echo "[ERROR] 入力されたバージョン種類が不正です\n";
+                $value = null;
+            }
+        }
+
+        $cvo -> nowVersion = $nowVersion;
+        $cvo -> nextVersionType = $value;
+        if ($cvo -> nextVersionType == "patch") {
+            $cvo -> nextVersion = $patchVersion;
+        }
+        else if ($cvo -> nextVersionType == "minor") {
+            $cvo -> nextVersion = $minorVersion;
+        }
+        else if ($cvo -> nextVersionType == "major") {
+            $cvo -> nextVersion = $majorVersion;
+        }
+
+        echo "Q. アップグレードバージョンのディレクトリを別途作成しますか? [y/n] (y) :";
+        $value = trim(fgets(STDIN));
+        if (!$value || $value == "y" || $value == "Y") {
+            $cvo -> directoryCopy = true;
+        }
+        else {
+            $cvo -> directoryCopy = false;
+        }
+
+        echo "\n";
+        echo "  container name              : " . $cvo->name . "\n";
+        echo "  version upgrade type        : " . $cvo->nextVersionType . "\n";
+        echo "  version                     : " . $cvo->nowVersion . " -> " . $cvo->nextVersion . "\n";
+        echo "  create version directory    : " . $cvo->directoryCopy ."\n\n";
+        echo "Q. 下記内容でアップグレードバージョンを作成します。よろしいですか？[y/n] (y) :";
+
+        $value = trim(fgets(STDIN));
+        if ($value == "" || $value == "y" || $value == "Y"){
+            $value = true;
+        }
+        else {
+            $value = false;
+        }
+
+        if ($value) {
+            ContainerDevelopment::versionUp($cvo);
+        }
+
+    }
+
+    public function switch() {
+        echo "[Kiwi Container Switch]";
+    }
+
+    public function commit() {
+        echo "[Kiwi ]";
+    }
+
+    public function inset() {
+        echo "[Kiwi ]";
+    }
+
+    public function export() {
+        echo "[Kiwi Export]";
+    }
+
+    public function import() {
+        echo "[Kiwi Import]";
     }
 }
