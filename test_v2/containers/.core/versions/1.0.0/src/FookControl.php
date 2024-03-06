@@ -27,23 +27,66 @@ namespace kiwi\core;
 
 class FookControl {
 
+    /**
+     * load Fook class object
+     */
     public static function load(string $fookName) : array {
-    
-        return [];
+        $containerVersions = kiwiLoad()["versions"];
+        $res = [];
+        foreach ($containerVersions as $container => $version) {
+             $fullFookName = "kiwi\\" . $container. "\\fooks\\" . $fookName . "Fook";
+ ;
+             if (!class_exists($fullFookName)) {
+                 continue;
+             }
+ 
+             $fook = new $fullFookName();
+ 
+             $res[] = $fook;
+        }
+
+        return $res;
     }
 
+    /**
+     * load fook class Object On Container
+     */
     public static function loadOnContainer(string $containerName, string $fookName) {
-    
-        return;
+        $fullFookName = "kiwi\\" . $containerName. "\\fooks\\" . $fookName . "Fook";
+        if (!class_exists($fullFookName)) {
+            return null;
+        }
+        return new $fullFookName();
     }
 
-    public static function excute(string $fookName, string $methodName) : array {
-
-        return [];
+    /**
+     * execute fook class method
+     */
+    public static function excute(string $fookName, string $methodName = "run") : array {
+        $lists = self::load($fookName);
+        $res = [];
+        foreach ($lists as $l_) {
+            if (!method_exists($l_, $methodName)) {
+                continue;
+            }
+            $res[] = $l_->{$methodName}();
+        }
+        return $res;
     }
 
-    public static function excuteonContainer(string $containerName, string $fookName, string $methodName) {
+    /**
+     * execute fook class on container
+     */
+    public static function excuteonContainer(string $containerName, string $fookName, string $methodName = "run") {
+        $fook = self::loadOnContainer($containerName, $fookName);
+        if (!$fook) {
+            return;
+        }
 
-        return;
+        if (!method_exists($fook,$methodName)) {
+            return;
+        }
+
+        return $fook->{$methodName}();
     }
 }

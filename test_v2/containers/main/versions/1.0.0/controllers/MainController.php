@@ -7,6 +7,7 @@ use kiwi\core\Render;
 use kiwi\core\Resource;
 use kiwi\core\Temporary;
 use kiwi\core\Writable;
+use kiwi\core\FookControl;
 
 class MainController extends Controller {
 
@@ -50,6 +51,11 @@ class MainController extends Controller {
        //  echo Writable::rename("/public/before_name.txt", "/public/after_name.txt");
        // echo Writable::save("/public/save.txt", "save text...");
        // echo Temporary::mkdir("/testdir..");
+/*
+       $fook = FookControl::excute("Test", "run");
+
+        print_r($fook);
+*/
     }
 
 //    public function handleAfter() : void {}
