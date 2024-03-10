@@ -2,7 +2,7 @@
 
 namespace kiwifw\configs;
 
-use kiwi\core\configs\ProjectConfig as PC;
+use kiwi\core\ProjectConfig as PC;
 
 class ProjectConfig extends PC {
 

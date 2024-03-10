@@ -25,15 +25,24 @@
 
 namespace kiwi\core;
 
+/***
+ * ***Migration***  
+ * Base class for migration.  
+ * Please install a class file with a version number in each container..
+ */
 class Migration {
 
     /**
-     * アップグレード実行用イベント
+     * ***pupgrade***  
+     * Event functions for performing upgrades.
+     * @return void
      */
     public function upgrade() : void {}
 
     /**
-     * ダウングレード実行用イベント
+     * ***pupgrade***  
+     * Event functions for performing downgrade.
+     * @return void
      */
     public function downgrade() : void {}
 }

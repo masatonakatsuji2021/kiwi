@@ -8,6 +8,7 @@ use kiwi\core\Resource;
 use kiwi\core\Temporary;
 use kiwi\core\Writable;
 use kiwi\core\FookControl;
+use kiwi\core\MigrationControl;
 
 class MainController extends Controller {
 
@@ -29,6 +30,21 @@ class MainController extends Controller {
     public function page2() {
         $this->autoRender = false;
 
+        echo "upgrade 1.0.0 -> 1.0.15";
+        MigrationControl::upgrade("1.0.0", "1.0.15");
+        echo "<br>";
+        echo "downgrade 1.0.15 -> 1.0.1";
+        MigrationControl::downgrade("1.0.15", "1.0.1");
+        echo "<br>";
+        echo "install";
+        MigrationControl::install();
+        echo "<br>";
+        echo "uninstall";
+        MigrationControl::uninstall();
+        echo "<br>";
+        echo "sub1 install";
+        MigrationControl::install("sub1");
+        
         /*
         echo Resource::exists("/common/image1.png");
         echo "<br>";
